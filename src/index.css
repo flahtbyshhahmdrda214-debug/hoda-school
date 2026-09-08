@@ -1,0 +1,81 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-feature-settings: "ss01", "ss02", "cv01";
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-800 font-vazir antialiased overflow-x-hidden;
+  }
+}
+
+/* Custom Glassmorphism */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 10px 30px -10px rgba(11, 25, 44, 0.12);
+}
+
+.glass-nav-card {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 28px -6px rgba(15, 36, 92, 0.15), 0 4px 10px -2px rgba(0, 0, 0, 0.05);
+}
+
+.glass-navy-card {
+  background: rgba(15, 36, 92, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(41, 82, 150, 0.4);
+  box-shadow: 0 20px 40px -15px rgba(8, 21, 56, 0.5);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #0d9488;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0f766e;
+}
+
+/* Infinite Marquee animations */
+@keyframes marquee-rtl {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(50%);
+  }
+}
+
+.animate-marquee-continuous {
+  display: flex;
+  width: 200%;
+  animation: marquee-rtl 40s linear infinite;
+}
+
+.animate-marquee-continuous:hover {
+  animation-play-state: paused;
+}
+
+/* Pattern overlay */
+.islamic-subtle-pattern {
+  background-image: radial-gradient(rgba(13, 148, 136, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
