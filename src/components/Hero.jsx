@@ -1,6 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { ChevronDown, Sparkles, GraduationCap, PhoneCall, ArrowLeft } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
+import Hoda3DLogo from './Hoda3DLogo';
 
 export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentity }) {
   const schoolStyles = {
@@ -55,7 +56,7 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
           className="w-full h-full object-cover object-center scale-105 transform motion-safe:transition-transform duration-1000 ease-out"
         />
         {/* Soft overlay gradient for crisp typography */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-slate-950/70 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-slate-950/75 pointer-events-none" />
       </div>
 
       {/* Top Header & 4 Floating School Cards (Exact match to reference photo) */}
@@ -63,9 +64,12 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
         
         {/* Top Info Bar */}
         <div className="flex items-center justify-between pb-3 text-xs md:text-sm font-medium text-slate-800 backdrop-blur-md bg-white/80 rounded-2xl px-4 py-2 mb-4 border border-white/70 shadow-sm">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-turquoise-500 animate-pulse"></span>
-            <span className="text-navy-950 font-bold">پذیرش و پیش‌ثبت‌نام سال تحصیلی ۱۴۰۴-۱۴۰۵ آغاز شد</span>
+          <div className="flex items-center gap-3">
+            <Hoda3DLogo size="sm" interactive={false} className="!w-7 !h-7" />
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-2.5 h-2.5 rounded-full bg-turquoise-500 animate-pulse"></span>
+              <span className="text-navy-950 font-bold">پذیرش و پیش‌ثبت‌نام سال تحصیلی ۱۴۰۴-۱۴۰۵ آغاز شد</span>
+            </div>
           </div>
           <div className="hidden sm:flex items-center gap-5 text-slate-700">
             <a href="#schools" className="hover:text-turquoise-600 transition-colors font-medium">معرفی مدارس چهارگانه</a>
@@ -118,30 +122,35 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
         </div>
       </div>
 
-      {/* Center Section: Typography and Slogan ONLY (Exact match to reference photo, NO center book image) */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 my-auto py-12 md:py-16">
-        <div className="max-w-3xl mx-auto">
+      {/* Center Section: 3D Hoda Medallion + Typography and Slogan */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 my-auto py-8 md:py-12">
+        <div className="max-w-3xl mx-auto flex flex-col items-center">
           
+          {/* Interactive 3D Hoda Logo Medallion */}
+          <div className="mb-3">
+            <Hoda3DLogo size="md" />
+          </div>
+
           {/* Main Title matching reference photo */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-navy-950 tracking-tight drop-shadow-sm font-vazir">
-            گروه مدارس
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-navy-950 tracking-tight drop-shadow-sm font-vazir">
+            مجتمع آموزشی قرآنی هدی
           </h1>
 
           {/* Decorative Divider Lines with Subtitle */}
-          <div className="flex items-center justify-center gap-3 sm:gap-5 mt-4 sm:mt-5 max-w-xl mx-auto">
+          <div className="flex items-center justify-center gap-3 sm:gap-5 mt-3 sm:mt-4 max-w-xl mx-auto">
             <span className="h-[2px] w-12 sm:w-20 bg-gradient-to-l from-navy-900 to-transparent rounded-full" />
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-navy-900 tracking-wide">
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-navy-900 tracking-wide">
               با هم برای فردای بهتر
             </p>
             <span className="h-[2px] w-12 sm:w-20 bg-gradient-to-r from-navy-900 to-transparent rounded-full" />
           </div>
 
-          <p className="mt-4 text-xs sm:text-sm md:text-base text-slate-800 max-w-lg mx-auto font-medium leading-relaxed bg-white/70 backdrop-blur-sm rounded-full py-1.5 px-5 border border-white/70 shadow-sm">
-            مجتمع آموزشی قرآنی هدی • تلفیق اصالت تربیتی قرآن کریم با پیشتازی علمی
+          <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-800 max-w-lg mx-auto font-medium leading-relaxed bg-white/75 backdrop-blur-sm rounded-full py-1.5 px-5 border border-white/70 shadow-sm">
+            تلفیق اصالت تربیتی قرآن کریم با پیشتازی علمی و هوشمندسازی نوین
           </p>
 
           {/* Fast CTA Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-7">
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
             <a
               href="#fast-consultation"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-navy-950 hover:bg-navy-900 text-white font-bold text-sm shadow-xl hover:shadow-navy-950/30 transition-all transform hover:-translate-y-0.5"

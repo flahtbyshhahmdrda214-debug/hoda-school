@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { 
   Phone, 
   Mail, 
@@ -12,6 +12,7 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
+import Hoda3DLogo from './Hoda3DLogo';
 
 export default function Footer({ onSelectSchool }) {
   const scrollToTop = () => {
@@ -78,9 +79,7 @@ export default function Footer({ onSelectSchool }) {
           {/* Column 1: Brand & Bio (4 cols) */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-turquoise-500 to-teal-700 flex items-center justify-center text-white shadow-lg">
-                <BookOpen className="w-6 h-6" />
-              </div>
+              <Hoda3DLogo size="sm" interactive={false} className="!w-14 !h-14 flex-shrink-0" />
               <div>
                 <h4 className="text-lg font-black text-white">
                   مجتمع آموزشی قرآنی هدی
