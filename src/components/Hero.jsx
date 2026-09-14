@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ChevronDown, Sparkles, GraduationCap, PhoneCall, ArrowLeft } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
 import Hoda3DLogo from './Hoda3DLogo';
@@ -126,9 +126,9 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 my-auto py-8 md:py-12">
         <div className="max-w-3xl mx-auto flex flex-col items-center">
           
-          {/* Interactive 3D Hoda Logo Medallion */}
-          <div className="mb-3">
-            <Hoda3DLogo size="md" />
+          {/* Interactive 3D Hoda Logo Medallion (4K, Ultra Clean, Large & Motion-enabled) */}
+          <div className="mb-2 sm:mb-4">
+            <Hoda3DLogo size="xl" motion={true} />
           </div>
 
           {/* Main Title matching reference photo */}

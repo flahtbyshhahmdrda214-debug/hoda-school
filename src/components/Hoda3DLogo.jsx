@@ -1,16 +1,24 @@
 ﻿import React, { useState, useRef } from 'react';
+import { Sparkles } from 'lucide-react';
 
-export default function Hoda3DLogo({ size = 'md', interactive = true, className = '' }) {
+export default function Hoda3DLogo({ 
+  size = 'xl', 
+  interactive = true, 
+  motion = true, 
+  className = '' 
+}) {
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
   const containerRef = useRef(null);
 
   const sizeClasses = {
-    sm: 'w-12 h-12',
-    md: 'w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36',
-    lg: 'w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56',
-    xl: 'w-52 h-52 sm:w-64 sm:h-64'
+    xs: 'w-8 h-8',
+    sm: 'w-12 h-12 sm:w-14 sm:h-14',
+    md: 'w-32 h-32 sm:w-40 sm:h-40',
+    lg: 'w-44 h-44 sm:w-52 sm:h-52 md:w-60 md:h-60',
+    xl: 'w-52 h-52 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80',
+    '2xl': 'w-64 h-64 sm:w-76 sm:h-76 md:w-88 md:h-88 lg:w-96 lg:h-96'
   };
 
   const handleMouseMove = (e) => {
@@ -21,9 +29,9 @@ export default function Hoda3DLogo({ size = 'md', interactive = true, className 
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
     
-    // Smooth 3D tilt calculation (-18deg to +18deg)
-    const rotateX = ((y - centerY) / centerY) * -18;
-    const rotateY = ((x - centerX) / centerX) * 18;
+    // Smooth 3D tilt calculation (-20deg to +20deg)
+    const rotateX = ((y - centerY) / centerY) * -22;
+    const rotateY = ((x - centerX) / centerX) * 22;
     
     setRotate({ x: rotateX, y: rotateY });
   };
@@ -44,7 +52,7 @@ export default function Hoda3DLogo({ size = 'md', interactive = true, className 
     setIsSpinning(true);
     setTimeout(() => {
       setIsSpinning(false);
-    }, 1200);
+    }, 1400);
   };
 
   return (
@@ -54,56 +62,85 @@ export default function Hoda3DLogo({ size = 'md', interactive = true, className 
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      style={{ perspective: '900px' }}
-      className={`relative select-none flex items-center justify-center cursor-pointer ${sizeClasses[size] || sizeClasses.md} ${className}`}
-      title="نشان سه‌بعدی مجتمع هدی (جهت چرخش ۳بعدی کلیک کنید)"
+      style={{ perspective: '1100px' }}
+      className={`relative select-none flex items-center justify-center cursor-pointer group ${sizeClasses[size] || sizeClasses.xl} ${className}`}
+      title="نشان سه‌بعدی ۴K مجتمع قرآنی هدی (کلیک جهت چرخش ۳بعدی)"
     >
-      {/* Background Soft Aura Glow */}
+      {/* 1. Multi-Layer Pulsing Aura Glow (Motion) */}
       <div 
-        className={`absolute inset-0 rounded-full bg-gradient-to-tr from-turquoise-500/30 via-amber-400/25 to-emerald-500/30 blur-2xl transition-opacity duration-500 pointer-events-none ${
-          isHovered ? 'opacity-100 scale-125' : 'opacity-70 scale-100'
-        }`}
+        className={`absolute -inset-4 rounded-full bg-gradient-to-tr from-turquoise-500/35 via-amber-400/30 to-emerald-500/35 blur-3xl transition-all duration-700 pointer-events-none ${
+          motion ? 'animate-pulse-halo' : ''
+        } ${isHovered ? 'scale-125 opacity-100' : 'opacity-75'}`}
       />
 
-      {/* 3D Transform Container */}
+      {/* 2. Soft Secondary Rim Glow */}
+      <div 
+        className="absolute inset-2 rounded-full bg-turquoise-400/20 blur-xl pointer-events-none"
+      />
+
+      {/* 3. Orbiting Sparkle Stars (Motion decor) */}
+      {motion && size !== 'xs' && size !== 'sm' && (
+        <div className="absolute inset-0 pointer-events-none animate-orbit-stars">
+          <div className="absolute top-1 right-3 text-amber-300 animate-pulse">
+            <Sparkles className="w-4 h-4 opacity-80" />
+          </div>
+          <div className="absolute bottom-2 left-4 text-turquoise-300 animate-pulse delay-500">
+            <Sparkles className="w-3.5 h-3.5 opacity-80" />
+          </div>
+        </div>
+      )}
+
+      {/* 4. Main 3D Floating & Rotating Container */}
       <div
         style={{
           transform: isSpinning
-            ? 'rotateY(360deg) scale(1.08)'
+            ? 'rotateY(360deg) scale(1.12)'
             : isHovered
-            ? `rotateX(${rotate.x}deg) rotateY(${rotate.y}deg) scale(1.06)`
+            ? `rotateX(${rotate.x}deg) rotateY(${rotate.y}deg) scale(1.08)`
             : 'rotateX(0deg) rotateY(0deg) scale(1)',
           transition: isSpinning
-            ? 'transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            ? 'transform 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
             : isHovered
-            ? 'transform 0.1s ease-out'
-            : 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+            ? 'transform 0.12s ease-out'
+            : 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
           transformStyle: 'preserve-3d',
         }}
-        className="relative w-full h-full flex items-center justify-center filter drop-shadow-2xl"
+        className={`relative w-full h-full flex items-center justify-center filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.4)] ${
+          motion && !isHovered && !isSpinning ? 'animate-float-3d' : ''
+        }`}
       >
-        {/* 3D Extruded Depth Shadow */}
+        {/* 4K Ultra-Crisp Transparent 3D Logo */}
         <img
-          src="/assets/hoda-3d-logo-transparent.png"
-          alt="نشان سه‌بعدی مجتمع آموزشی و قرآنی هدی"
-          className="w-full h-full object-contain filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.35)] pointer-events-none"
+          src="/assets/hoda-3d-logo-4k.png"
+          alt="نشان سه‌بعدی ۴K مجتمع آموزشی و قرآنی هدی"
+          loading="eager"
+          decoding="async"
+          className="w-full h-full object-contain pointer-events-none transform transition-transform filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.3)]"
         />
 
-        {/* Dynamic Specular Sheen on Hover */}
+        {/* 5. Continuous Light Sweep Motion Beam (حرکت شاین و بازتاب نور روی طلا و حروف) */}
+        {motion && (
+          <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none mix-blend-overlay">
+            <div className="w-[200%] h-14 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full animate-light-sweep" />
+          </div>
+        )}
+
+        {/* 6. Dynamic Mouse-Follow Specular Sheen */}
         {isHovered && (
           <div
             style={{
-              background: `radial-gradient(circle at ${50 + rotate.y * 2}% ${50 - rotate.x * 2}%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 65%)`,
+              background: `radial-gradient(circle at ${50 + rotate.y * 1.8}% ${50 - rotate.x * 1.8}%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 60%)`,
             }}
-            className="absolute inset-0 rounded-full pointer-events-none mix-blend-overlay transition-opacity duration-200"
+            className="absolute inset-0 rounded-full pointer-events-none mix-blend-overlay transition-opacity duration-150"
           />
         )}
       </div>
 
-      {/* Floating 3D Badge Tooltip on Hover */}
-      {isHovered && !isSpinning && (
-        <div className="absolute -bottom-7 px-3 py-1 rounded-full bg-navy-950/90 backdrop-blur-md text-white border border-turquoise-400/40 text-[10px] font-bold tracking-tight shadow-xl whitespace-nowrap z-20 pointer-events-none animate-fadeIn">
-          مدل سه‌بعدی هدی • کلیک جهت چرخش
+      {/* 7. Floating 3D Badge Tooltip on Hover */}
+      {isHovered && !isSpinning && size !== 'xs' && size !== 'sm' && (
+        <div className="absolute -bottom-8 px-3.5 py-1 rounded-full bg-navy-950/90 backdrop-blur-md text-white border border-turquoise-400/50 text-[11px] font-bold tracking-tight shadow-2xl whitespace-nowrap z-20 pointer-events-none animate-fadeIn flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span>مدل سه‌بعدی ۴K هدی • برای چرخش کلیک کنید</span>
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -78,4 +78,71 @@
 .islamic-subtle-pattern {
   background-image: radial-gradient(rgba(13, 148, 136, 0.08) 1px, transparent 1px);
   background-size: 24px 24px;
+}
+
+/* 3D Motion Keyframes for Hoda Logo */
+@keyframes float-3d-gentle {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg) rotateY(0deg) scale(1);
+  }
+  30% {
+    transform: translateY(-10px) rotateX(3deg) rotateY(-4deg) scale(1.02);
+  }
+  70% {
+    transform: translateY(-6px) rotateX(-2deg) rotateY(4deg) scale(1.01);
+  }
+}
+
+@keyframes light-sweep {
+  0% {
+    transform: translateX(-160%) translateY(-50%) rotate(30deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateX(180%) translateY(-50%) rotate(30deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(180%) translateY(-50%) rotate(30deg);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse-halo {
+  0%, 100% {
+    transform: scale(0.92);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 0.85;
+  }
+}
+
+@keyframes orbit-stars {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-float-3d {
+  animation: float-3d-gentle 6s ease-in-out infinite;
+}
+
+.animate-light-sweep {
+  animation: light-sweep 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-pulse-halo {
+  animation: pulse-halo 4.5s ease-in-out infinite;
+}
+
+.animate-orbit-stars {
+  animation: orbit-stars 25s linear infinite;
 }
