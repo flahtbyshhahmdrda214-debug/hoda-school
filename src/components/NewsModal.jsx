@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { X, Calendar, Clock, Tag, Share2, ArrowLeft } from 'lucide-react';
 
 export default function NewsModal({ news, onClose }) {

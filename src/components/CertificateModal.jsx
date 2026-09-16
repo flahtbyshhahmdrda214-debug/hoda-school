@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { X, ShieldCheck, Award, CheckCircle2, Calendar, Building, Stamp } from 'lucide-react';
 
 export default function CertificateModal({ item, onClose }) {

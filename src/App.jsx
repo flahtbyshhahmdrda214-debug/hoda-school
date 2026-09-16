@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Hero from './components/Hero';
 import CredentialsTicker from './components/CredentialsTicker';
 import NewsSection from './components/NewsSection';

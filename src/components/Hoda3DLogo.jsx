@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Sparkles } from 'lucide-react';
 
 export default function Hoda3DLogo({ 

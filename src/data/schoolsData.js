@@ -1,4 +1,4 @@
-﻿export const schoolsData = [
+export const schoolsData = [
   {
     id: 1,
     slug: 'primary-one',

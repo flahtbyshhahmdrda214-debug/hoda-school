@@ -1,4 +1,4 @@
-﻿export const credentialsData = [
+export const credentialsData = [
   {
     id: 1,
     code: 'LIC-3482-MEDU',

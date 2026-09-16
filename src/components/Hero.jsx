@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ChevronDown, Sparkles, GraduationCap, PhoneCall, ArrowLeft } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
 import Hoda3DLogo from './Hoda3DLogo';

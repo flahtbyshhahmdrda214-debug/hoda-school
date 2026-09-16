@@ -1,4 +1,4 @@
-﻿export const newsData = [
+export const newsData = [
   {
     id: 1,
     title: 'آغاز پیش‌ثبت‌نام سال تحصیلی جدید در مدارس چهارگانه مجتمع هدی',

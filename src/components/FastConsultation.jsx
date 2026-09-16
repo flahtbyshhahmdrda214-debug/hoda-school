@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Sparkles, Send, CheckCircle2, PhoneCall, HelpCircle, ShieldCheck } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
 
