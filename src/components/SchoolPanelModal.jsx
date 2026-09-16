@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   X, 
   Building2, 
@@ -89,11 +89,12 @@ export default function SchoolPanelModal({ school, onClose, onSelectSchool }) {
           {/* School Titles & 3D Clay Icon */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white/95 p-1 shadow-lg flex-shrink-0 overflow-hidden">
+              {/* Free-Floating 3D Clay Icon */}
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center flex-shrink-0">
                 <img
                   src={school.icon3d}
                   alt={school.shortName}
-                  className="w-full h-full object-cover rounded-xl"
+                  className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.35)] transform hover:scale-110 transition-transform duration-300 pointer-events-none"
                 />
               </div>
               <div>

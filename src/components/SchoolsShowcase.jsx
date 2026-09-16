@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { 
   GraduationCap, 
   Users, 
@@ -84,12 +84,12 @@ export default function SchoolsShowcase({ onSelectSchool }) {
                           {school.fullName}
                         </h3>
                       </div>
-                      {/* 3D clay icon in banner */}
-                      <div className="w-16 h-16 rounded-2xl bg-white/95 p-1 flex items-center justify-center flex-shrink-0 shadow-md overflow-hidden transform group-hover:scale-110 transition-transform">
+                      {/* Free-Floating 3D clay icon in banner with motion */}
+                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center flex-shrink-0">
                         <img
                           src={school.icon3d}
                           alt={school.shortName}
-                          className="w-full h-full object-cover rounded-xl"
+                          className="w-full h-full object-contain filter drop-shadow-[0_12px_20px_rgba(0,0,0,0.3)] transform group-hover:scale-115 group-hover:-translate-y-1 transition-transform duration-500 pointer-events-none"
                         />
                       </div>
                     </div>
