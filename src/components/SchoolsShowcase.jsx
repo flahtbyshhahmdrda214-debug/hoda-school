@@ -12,32 +12,32 @@ import { schoolsData } from '../data/schoolsData';
 export default function SchoolsShowcase({ onSelectSchool }) {
   const badgeVariants = {
     1: {
-      headerGradient: 'from-navy-950 to-navy-850',
+      headerGradient: 'from-blue-700 to-indigo-800',
+      tagBg: 'bg-blue-50 text-blue-800 border-blue-200',
+      btnBg: 'bg-blue-600 hover:bg-blue-700 text-white',
+      accentColor: 'text-blue-600',
+      ring: 'group-hover:border-blue-400',
+    },
+    2: {
+      headerGradient: 'from-navy-950 via-navy-900 to-navy-850',
       tagBg: 'bg-navy-50 text-navy-900 border-navy-200',
       btnBg: 'bg-navy-950 hover:bg-navy-900 text-white',
       accentColor: 'text-navy-900',
       ring: 'group-hover:border-navy-400',
     },
-    2: {
+    3: {
       headerGradient: 'from-turquoise-700 to-teal-800',
       tagBg: 'bg-turquoise-50 text-turquoise-800 border-turquoise-200',
       btnBg: 'bg-turquoise-600 hover:bg-turquoise-700 text-white',
       accentColor: 'text-turquoise-600',
       ring: 'group-hover:border-turquoise-400',
     },
-    3: {
-      headerGradient: 'from-slate-700 to-slate-900',
-      tagBg: 'bg-slate-100 text-slate-800 border-slate-300',
-      btnBg: 'bg-slate-800 hover:bg-slate-700 text-white',
-      accentColor: 'text-slate-800',
-      ring: 'group-hover:border-slate-500',
-    },
     4: {
-      headerGradient: 'from-navy-950 via-navy-900 to-turquoise-900',
-      tagBg: 'bg-teal-50 text-teal-900 border-teal-200',
-      btnBg: 'bg-gradient-to-r from-navy-900 to-turquoise-700 hover:opacity-95 text-white',
-      accentColor: 'text-turquoise-700',
-      ring: 'group-hover:border-turquoise-500',
+      headerGradient: 'from-navy-950 via-teal-900 to-indigo-900',
+      tagBg: 'bg-indigo-50 text-indigo-900 border-indigo-200',
+      btnBg: 'bg-indigo-700 hover:bg-indigo-800 text-white',
+      accentColor: 'text-indigo-700',
+      ring: 'group-hover:border-indigo-400',
     },
   };
 
