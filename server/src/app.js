@@ -5,11 +5,24 @@ import cookie from '@fastify/cookie';
 import jwt from '@fastify/jwt';
 import rateLimit from '@fastify/rate-limit';
 import fastifyStatic from '@fastify/static';
+import multipart from '@fastify/multipart';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from './config/index.js';
 import { errorResponse, successResponse } from './utils/response.js';
+
+// Route Handlers
 import authRoutes from './routes/auth.routes.js';
+import mediaRoutes from './routes/media.routes.js';
+import schoolRoutes from './routes/school.routes.js';
+import teacherRoutes from './routes/teacher.routes.js';
+import facilityRoutes from './routes/facility.routes.js';
+import achievementRoutes from './routes/achievement.routes.js';
+import newsRoutes from './routes/news.routes.js';
+import documentRoutes from './routes/document.routes.js';
+import settingRoutes from './routes/setting.routes.js';
+import userRoutes from './routes/user.routes.js';
+import publicRoutes from './routes/public.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,7 +48,7 @@ export async function buildApp() {
   // 2. CORS with Credentials (Cookies)
   await app.register(cors, {
     origin: (origin, cb) => {
-      // Allow requests with no origin (like mobile apps, curl) or matched origin
+      // Allow requests with no origin or matched origins
       if (!origin || origin === config.corsOrigin || origin.includes('localhost') || origin.includes('127.0.0.1')) {
         cb(null, true);
         return;
@@ -68,17 +81,33 @@ export async function buildApp() {
     timeWindow: config.rateLimit.timeWindow
   });
 
-  // 6. Serve Uploads statically
+  // 6. Multipart Form & File Upload
+  await app.register(multipart, {
+    limits: {
+      fileSize: 20 * 1024 * 1024, // 20MB limit
+    }
+  });
+
+  // 7. Serve Uploads statically
   await app.register(fastifyStatic, {
     root: config.storage.uploadDir,
     prefix: '/uploads/'
   });
 
-  // 7. Core Authentication Routes
+  // 8. Register API v1 Routes
   await app.register(authRoutes, { prefix: '/api/v1/auth' });
+  await app.register(mediaRoutes, { prefix: '/api/v1/media' });
+  await app.register(schoolRoutes, { prefix: '/api/v1/schools' });
+  await app.register(teacherRoutes, { prefix: '/api/v1/teachers' });
+  await app.register(facilityRoutes, { prefix: '/api/v1/facilities' });
+  await app.register(achievementRoutes, { prefix: '/api/v1/achievements' });
+  await app.register(newsRoutes, { prefix: '/api/v1/news' });
+  await app.register(documentRoutes, { prefix: '/api/v1/documents' });
+  await app.register(settingRoutes, { prefix: '/api/v1/settings' });
+  await app.register(userRoutes, { prefix: '/api/v1/users' });
+  await app.register(publicRoutes, { prefix: '/api/v1/public' });
 
-  // 8. Health Check Route
-
+  // 9. Health Check Route
   app.get('/api/health', async (request, reply) => {
     return successResponse(reply, {
       status: 'ok',
@@ -89,12 +118,12 @@ export async function buildApp() {
     });
   });
 
-  // 8. 404 Handler
+  // 10. 404 Handler
   app.setNotFoundHandler((request, reply) => {
     return errorResponse(reply, 'مسیر درخواستی یافت نشد', 'NOT_FOUND', 404);
   });
 
-  // 9. Standardized Error Handler (No sensitive backend leaks)
+  // 11. Standardized Error Handler
   app.setErrorHandler((error, request, reply) => {
     request.log.error(error);
     
