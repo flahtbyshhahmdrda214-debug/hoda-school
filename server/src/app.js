@@ -9,6 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from './config/index.js';
 import { errorResponse, successResponse } from './utils/response.js';
+import authRoutes from './routes/auth.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -73,7 +74,11 @@ export async function buildApp() {
     prefix: '/uploads/'
   });
 
-  // 7. Health Check Route
+  // 7. Core Authentication Routes
+  await app.register(authRoutes, { prefix: '/api/v1/auth' });
+
+  // 8. Health Check Route
+
   app.get('/api/health', async (request, reply) => {
     return successResponse(reply, {
       status: 'ok',
