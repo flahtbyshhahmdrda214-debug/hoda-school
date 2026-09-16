@@ -170,3 +170,26 @@
 .animate-float-s3 { animation: float-s3 4.5s ease-in-out infinite 1.2s; }
 .animate-float-s4 { animation: float-s4 5.1s ease-in-out infinite 1.8s; }
 
+/* Dynamic Breathing Levitation Shadow Keyframes */
+@keyframes shadow-s1 {
+  0%, 100% { transform: scale(1); opacity: 0.28; }
+  50% { transform: scale(0.78); opacity: 0.14; }
+}
+@keyframes shadow-s2 {
+  0%, 100% { transform: scale(1); opacity: 0.28; }
+  50% { transform: scale(0.75); opacity: 0.13; }
+}
+@keyframes shadow-s3 {
+  0%, 100% { transform: scale(1); opacity: 0.28; }
+  50% { transform: scale(0.8); opacity: 0.15; }
+}
+@keyframes shadow-s4 {
+  0%, 100% { transform: scale(1); opacity: 0.28; }
+  50% { transform: scale(0.76); opacity: 0.14; }
+}
+
+.animate-shadow-s1 { animation: shadow-s1 4.2s ease-in-out infinite; }
+.animate-shadow-s2 { animation: shadow-s2 4.8s ease-in-out infinite 0.6s; }
+.animate-shadow-s3 { animation: shadow-s3 4.5s ease-in-out infinite 1.2s; }
+.animate-shadow-s4 { animation: shadow-s4 5.1s ease-in-out infinite 1.8s; }
+
