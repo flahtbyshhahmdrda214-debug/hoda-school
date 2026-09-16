@@ -1,110 +1,81 @@
-import React, { useState, useEffect } from 'react';
-import Hero from './components/Hero';
-import CredentialsTicker from './components/CredentialsTicker';
-import NewsSection from './components/NewsSection';
-import SchoolsShowcase from './components/SchoolsShowcase';
-import IdentitySection from './components/IdentitySection';
-import Footer from './components/Footer';
-import SchoolPanelModal from './components/SchoolPanelModal';
-import CertificateModal from './components/CertificateModal';
-import NewsModal from './components/NewsModal';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
-function App() {
-  const [selectedSchool, setSelectedSchool] = useState(null);
-  const [selectedCredential, setSelectedCredential] = useState(null);
-  const [selectedNews, setSelectedNews] = useState(null);
+// Public Pages
+import HomePage from './pages/HomePage';
+import SchoolDetailPage from './pages/SchoolDetailPage';
+import NewsPage from './pages/NewsPage';
+import NewsDetailPage from './pages/NewsDetailPage';
+import CredentialsPage from './pages/CredentialsPage';
+import AboutPage from './pages/AboutPage';
 
-  // Close modals on Escape key
+// Admin Pages
+import AdminLoginPage from './pages/admin/AdminLoginPage';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminSchools from './pages/admin/AdminSchools';
+import AdminNews from './pages/admin/AdminNews';
+import AdminTeachers from './pages/admin/AdminTeachers';
+import AdminFacilities from './pages/admin/AdminFacilities';
+import AdminDocuments from './pages/admin/AdminDocuments';
+import AdminMedia from './pages/admin/AdminMedia';
+import AdminSettings from './pages/admin/AdminSettings';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminAuditLogs from './pages/admin/AdminAuditLogs';
+import ProtectedRoute from './components/ProtectedRoute';
+
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        setSelectedSchool(null);
-        setSelectedCredential(null);
-        setSelectedNews(null);
+    if (hash) {
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        return;
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Prevent background scrolling when a modal is open
-  useEffect(() => {
-    if (selectedSchool || selectedCredential || selectedNews) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
     }
-  }, [selectedSchool, selectedCredential, selectedNews]);
+    window.scrollTo(0, 0);
+  }, [pathname, hash]);
 
-  const handleScrollToNews = () => {
-    const el = document.getElementById('news');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleScrollToIdentity = () => {
-    const el = document.getElementById('identity');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-turquoise-500 selection:text-white">
-      {/* 1. Hero Section (Matched with user's uploaded photo: 4 cards at top, center logo and title) */}
-      <Hero
-        onSelectSchool={setSelectedSchool}
-        onScrollToNews={handleScrollToNews}
-        onScrollToIdentity={handleScrollToIdentity}
-      />
-
-      {/* 2. Running Ticker of Credentials, Licenses and Accreditations (Requested: نوار روان مدارک و اسناد معتبر) */}
-      <CredentialsTicker
-        onSelectCredential={setSelectedCredential}
-      />
-
-      {/* 3. Important News & Announcements (Requested: بخش اخبار مهم در صفحه اول) */}
-      <NewsSection
-        onSelectNews={setSelectedNews}
-      />
-
-      {/* 4. Showcase of the 4 Sub-schools */}
-      <SchoolsShowcase
-        onSelectSchool={setSelectedSchool}
-      />
-
-      {/* 5. Brand Identity, Quranic Mission & Statistics (Requested: هویت این مجموعه رو تعریف کنه و تبلیغاتی باشه) */}
-      <IdentitySection />
-
-      {/* 7. Comprehensive Footer (Requested: ته این سایت ها شماره تماس ایمیل و اطلاعات) */}
-      <Footer
-        onSelectSchool={setSelectedSchool}
-      />
-
-      {/* Modals */}
-      {/* School Dedicated Panel (Requested: پنل هر مدرسه معرفی معلم ها و افتخارات و معرفی هر مجموعه) */}
-      {selectedSchool && (
-        <SchoolPanelModal
-          school={selectedSchool}
-          onClose={() => setSelectedSchool(null)}
-          onSelectSchool={setSelectedSchool}
-        />
-      )}
-
-      {/* Certificate / Accreditation Detailed Verification Modal */}
-      {selectedCredential && (
-        <CertificateModal
-          item={selectedCredential}
-          onClose={() => setSelectedCredential(null)}
-        />
-      )}
-
-      {/* News Article Full View Modal */}
-      {selectedNews && (
-        <NewsModal
-          news={selectedNews}
-          onClose={() => setSelectedNews(null)}
-        />
-      )}
-    </div>
-  );
+  return null;
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+      <Routes>
+        {/* Public Visitor Routes */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/schools/:slug" element={<SchoolDetailPage />} />
+        <Route path="/news" element={<NewsPage />} />
+        <Route path="/news/:slug" element={<NewsDetailPage />} />
+        <Route path="/credentials" element={<CredentialsPage />} />
+        <Route path="/about" element={<AboutPage />} />
+
+        {/* Admin Authentication */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+
+        {/* Protected Admin CMS Dashboard Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="schools" element={<AdminSchools />} />
+            <Route path="news" element={<AdminNews />} />
+            <Route path="teachers" element={<AdminTeachers />} />
+            <Route path="facilities" element={<AdminFacilities />} />
+            <Route path="documents" element={<AdminDocuments />} />
+            <Route path="media" element={<AdminMedia />} />
+            <Route path="settings" element={<AdminSettings />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="audit-logs" element={<AdminAuditLogs />} />
+          </Route>
+        </Route>
+
+        {/* Catch-all redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
