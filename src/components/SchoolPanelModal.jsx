@@ -18,27 +18,14 @@ import {
 import { schoolsData } from '../data/schoolsData';
 
 export default function SchoolPanelModal({ school, onClose, onSelectSchool }) {
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'teachers' | 'honors' | 'register'
-  const [inquirySent, setInquirySent] = useState(false);
-  const [formData, setFormData] = useState({
-    studentName: '',
-    parentPhone: '',
-    grade: '',
-    note: ''
-  });
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'teachers' | 'honors'
 
   if (!school) return null;
-
-  const handleSubmitInquiry = (e) => {
-    e.preventDefault();
-    setInquirySent(true);
-  };
 
   const tabs = [
     { id: 'overview', label: 'معرفی مجموعه و امکانات', icon: Building2 },
     { id: 'teachers', label: `معرفی کادر و معلمان (${school.teachers.length})`, icon: Users },
     { id: 'honors', label: `افتخارات و دستاوردها (${school.honors.length})`, icon: Trophy },
-    { id: 'register', label: 'پیش‌ثبت‌نام و ارتباط مستقیم', icon: GraduationCap },
   ];
 
   return (
@@ -63,8 +50,7 @@ export default function SchoolPanelModal({ school, onClose, onSelectSchool }) {
                   onClick={() => {
                     onSelectSchool(s);
                     setActiveTab('overview');
-                    setInquirySent(false);
-                  }}
+                                      }}
                   className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
                     s.id === school.id
                       ? 'bg-white text-navy-900 shadow-md scale-105'
@@ -325,111 +311,7 @@ export default function SchoolPanelModal({ school, onClose, onSelectSchool }) {
             </div>
           )}
 
-          {/* TAB 4: PRE-REGISTRATION & DIRECT INQUIRY */}
-          {activeTab === 'register' && (
-            <div className="max-w-2xl mx-auto animate-fadeIn">
-              {inquirySent ? (
-                <div className="text-center py-10 bg-white rounded-3xl p-8 border border-emerald-200 shadow-lg">
-                  <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-xl font-black text-navy-950 mb-2">
-                    درخواست پیش‌ثبت‌نام شما برای {school.shortName} با موفقیت ثبت شد
-                  </h3>
-                  <p className="text-sm text-slate-600 leading-relaxed max-w-md mx-auto">
-                    همکاران ما در واحد پذیرش {school.shortName} حداکثر ظرف ۲۴ ساعت کاری با شماره ثبت‌شده تماس گرفته و زمان مصاحبه و سنجش را هماهنگ خواهند کرد.
-                  </p>
-                  <button
-                    onClick={() => setInquirySent(false)}
-                    className="mt-6 px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
-                  >
-                    ثبت درخواست جدید
-                  </button>
-                </div>
-              ) : (
-                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-md">
-                  <div className="mb-6 text-center">
-                    <span className="text-xs font-bold text-turquoise-700 bg-turquoise-50 px-3 py-1 rounded-full border border-turquoise-200">
-                      پذیرش سال تحصیلی ۱۴۰۴-۱۴۰۵
-                    </span>
-                    <h3 className="text-xl font-black text-navy-950 mt-2">
-                      فرم تقاضای ثبت‌نام اولیه در {school.shortName}
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-1">
-                      اطلاعات زیر را تکمیل کنید تا کارشناسان پذیرش با شما تماس بگیرند
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleSubmitInquiry} className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                        نام و نام خانوادگی دانش‌آموز *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.studentName}
-                        onChange={(e) => setFormData({...formData, studentName: e.target.value})}
-                        placeholder="مثلاً: علی رضایی"
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-turquoise-500 text-sm"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                          شماره تماس ولی (همراه) *
-                        </label>
-                        <input
-                          type="tel"
-                          required
-                          dir="ltr"
-                          value={formData.parentPhone}
-                          onChange={(e) => setFormData({...formData, parentPhone: e.target.value})}
-                          placeholder="۰۹۱۲XXXXXXX"
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-turquoise-500 text-sm text-right font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                          پایه تحصیلی مورد تقاضا *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={formData.grade}
-                          onChange={(e) => setFormData({...formData, grade: e.target.value})}
-                          placeholder="مثلاً: پایه اول یا پایه دهم"
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-turquoise-500 text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                        توضیحات تکمیلی یا سابقه قرآنی (اختیاری)
-                      </label>
-                      <textarea
-                        rows="3"
-                        value={formData.note}
-                        onChange={(e) => setFormData({...formData, note: e.target.value})}
-                        placeholder="آیا دانش‌آموز سابقه حفظ قرآن یا شرکت در مسابقات علمی دارد؟"
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-turquoise-500 text-sm"
-                      ></textarea>
-                    </div>
-
-                    <button
-                      type="submit"
-                      className={`w-full py-3.5 rounded-xl bg-gradient-to-r ${school.colorClasses.gradient} text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer`}
-                    >
-                      <Send className="w-4 h-4" />
-                      <span>ارسال درخواست پیش‌ثبت‌نام در {school.shortName}</span>
-                    </button>
-                  </form>
-                </div>
-              )}
-            </div>
-          )}
+          
 
         </div>
 

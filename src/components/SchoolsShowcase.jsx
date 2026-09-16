@@ -156,7 +156,7 @@ export default function SchoolsShowcase({ onSelectSchool }) {
                     onClick={() => onSelectSchool(school)}
                     className={`w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-2xl ${v.btnBg} font-bold text-sm shadow-md hover:shadow-lg transition-all transform active:scale-98 cursor-pointer`}
                   >
-                    <span>ورود به پنل جامع {school.shortName} (معلمان، افتخارات، ثبت‌نام)</span>
+                    <span>مشاهده مشخصات جامع {school.shortName} (امکانات، اساتید و افتخارات)</span>
                     <ArrowLeft className="w-4 h-4" />
                   </button>
                 </div>

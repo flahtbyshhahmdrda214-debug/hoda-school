@@ -68,7 +68,7 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
             <Hoda3DLogo size="sm" interactive={false} className="!w-7 !h-7" />
             <div className="flex items-center gap-2">
               <span className="inline-block w-2.5 h-2.5 rounded-full bg-turquoise-500 animate-pulse"></span>
-              <span className="text-navy-950 font-bold">پذیرش و پیش‌ثبت‌نام سال تحصیلی ۱۴۰۴-۱۴۰۵ آغاز شد</span>
+              <span className="text-navy-950 font-bold">وب‌سایت رسمی مجتمع آموزشی قرآنی هدی | پیشگام در تربیت قرآنی و سرآمدی علمی</span>
             </div>
           </div>
           <div className="hidden sm:flex items-center gap-5 text-slate-700">
@@ -154,21 +154,21 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
             تلفیق اصالت تربیتی قرآن کریم با پیشتازی علمی و هوشمندسازی نوین
           </p>
 
-          {/* Fast CTA Buttons */}
+          {/* Institutional Showcase CTA Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3 mt-4 sm:mt-5">
             <a
-              href="#fast-consultation"
+              href="#schools"
               className="inline-flex items-center gap-2 px-6 py-2.5 sm:py-3 rounded-xl bg-navy-950 hover:bg-navy-900 text-white font-bold text-sm shadow-xl hover:shadow-navy-950/30 transition-all transform hover:-translate-y-0.5"
             >
-              <Sparkles className="w-4 h-4 text-turquoise-400" />
-              درخواست مشاوره و ثبت‌نام
+              <GraduationCap className="w-4 h-4 text-turquoise-400" />
+              بررسی مدارس چهارگانه
             </a>
             <a
-              href="#schools"
+              href="#identity"
               className="inline-flex items-center gap-2 px-6 py-2.5 sm:py-3 rounded-xl bg-white/95 hover:bg-white text-navy-950 font-bold text-sm shadow-lg hover:shadow-xl border border-white/90 transition-all transform hover:-translate-y-0.5"
             >
-              <GraduationCap className="w-4 h-4 text-turquoise-600" />
-              بررسی مدارس چهارگانه
+              <Sparkles className="w-4 h-4 text-turquoise-600" />
+              هویت قرآنی و افتخارات
             </a>
           </div>
         </div>

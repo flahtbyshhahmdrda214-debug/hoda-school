@@ -4,7 +4,6 @@ import CredentialsTicker from './components/CredentialsTicker';
 import NewsSection from './components/NewsSection';
 import SchoolsShowcase from './components/SchoolsShowcase';
 import IdentitySection from './components/IdentitySection';
-import FastConsultation from './components/FastConsultation';
 import Footer from './components/Footer';
 import SchoolPanelModal from './components/SchoolPanelModal';
 import CertificateModal from './components/CertificateModal';
@@ -73,9 +72,6 @@ function App() {
 
       {/* 5. Brand Identity, Quranic Mission & Statistics (Requested: هویت این مجموعه رو تعریف کنه و تبلیغاتی باشه) */}
       <IdentitySection />
-
-      {/* 6. Fast Consultation & Pre-registration Form */}
-      <FastConsultation />
 
       {/* 7. Comprehensive Footer (Requested: ته این سایت ها شماره تماس ایمیل و اطلاعات) */}
       <Footer

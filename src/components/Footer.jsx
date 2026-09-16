@@ -133,7 +133,7 @@ export default function Footer({ onSelectSchool }) {
                 <a href="#identity" className="hover:text-turquoise-400 transition-colors">هویت و فلسفه آموزشی</a>
               </li>
               <li>
-                <a href="#fast-consultation" className="hover:text-turquoise-400 transition-colors">درخواست مشاوره و پذیرش</a>
+                <a href="#contact" className="hover:text-turquoise-400 transition-colors">اطلاعات تماس با شعب</a>
               </li>
             </ul>
           </div>
