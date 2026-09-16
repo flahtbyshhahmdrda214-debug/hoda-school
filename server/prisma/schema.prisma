@@ -1,0 +1,255 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String      @id @default(uuid())
+  username      String      @unique
+  email         String      @unique
+  passwordHash  String      @map("password_hash")
+  fullName      String      @map("full_name")
+  role          String      @default("EDITOR") // SUPERADMIN, SCHOOL_ADMIN, EDITOR
+  schoolId      String?     @map("school_id")
+  school        School?     @relation(fields: [schoolId], references: [id])
+  isActive      Boolean     @default(true) @map("is_active")
+  lastLoginAt   DateTime?   @map("last_login_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  newsCreated   News[]      @relation("AuthorNews")
+  auditLogs     AuditLog[]
+  mediaUploaded Media[]
+
+  @@map("users")
+}
+
+model School {
+  id                     String        @id @default(uuid())
+  slug                   String        @unique // boys-elementary, boys-highschool, girls-elementary, girls-highschool
+  shortName              String        @map("short_name")
+  fullName               String        @map("full_name")
+  subtitle               String?
+  tag                    String?
+  themeColor             String        @default("blue") @map("theme_color")
+  icon3dUrl              String?       @map("icon_3d_url")
+  overview               String?
+  quranicProgramTitle    String?       @map("quranic_program_title")
+  quranicProgramFeatures String?       @map("quranic_program_features") // JSON string array
+  phone                  String?
+  email                  String?
+  address                String?
+  stats                  String?       // JSON string array
+  isActive               Boolean       @default(true) @map("is_active")
+  sortOrder              Int           @default(0) @map("sort_order")
+  createdAt              DateTime      @default(now()) @map("created_at")
+  updatedAt              DateTime      @updatedAt @map("updated_at")
+  teachers               Teacher[]
+  staff                  Staff[]
+  facilities             Facility[]
+  news                   News[]
+  achievements           Achievement[]
+  gallery                Gallery[]
+  users                  User[]
+
+  @@map("schools")
+}
+
+model Teacher {
+  id          String   @id @default(uuid())
+  schoolId    String   @map("school_id")
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  firstName   String   @map("first_name")
+  lastName    String   @map("last_name")
+  roleTitle   String   @map("role_title")
+  degree      String?
+  experience  String?
+  highlight   String?
+  avatarUrl   String?  @map("avatar_url")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isPublished Boolean  @default(true) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("teachers")
+}
+
+model Staff {
+  id          String   @id @default(uuid())
+  schoolId    String   @map("school_id")
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  firstName   String   @map("first_name")
+  lastName    String   @map("last_name")
+  roleTitle   String   @map("role_title")
+  department  String?
+  phone       String?
+  avatarUrl   String?  @map("avatar_url")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isPublished Boolean  @default(true) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("staff")
+}
+
+model Facility {
+  id          String   @id @default(uuid())
+  schoolId    String   @map("school_id")
+  school      School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  iconName    String?  @map("icon_name")
+  imageUrl    String?  @map("image_url")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isPublished Boolean  @default(true) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("facilities")
+}
+
+model News {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  title         String
+  summary       String
+  contentHtml   String    @map("content_html")
+  coverImageUrl String?   @map("cover_image_url")
+  category      String
+  schoolId      String?   @map("school_id")
+  school        School?   @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  isFeatured    Boolean   @default(false) @map("is_featured")
+  isPublished   Boolean   @default(true) @map("is_published")
+  publishedAt   DateTime  @default(now()) @map("published_at")
+  viewsCount    Int       @default(0) @map("views_count")
+  authorId      String?   @map("author_id")
+  author        User?     @relation("AuthorNews", fields: [authorId], references: [id])
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("news")
+}
+
+model Achievement {
+  id          String   @id @default(uuid())
+  schoolId    String?  @map("school_id")
+  school      School?  @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  year        String
+  title       String
+  recipient   String?
+  description String?
+  category    String
+  imageUrl    String?  @map("image_url")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isPublished Boolean  @default(true) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("achievements")
+}
+
+model Document {
+  id              String   @id @default(uuid())
+  title           String
+  description     String?
+  previewImageUrl String?  @map("preview_image_url")
+  fileUrl         String   @map("file_url")
+  issuer          String
+  documentNumber  String?  @map("document_number")
+  issueDate       String?  @map("issue_date")
+  iconName        String?  @default("ShieldCheck") @map("icon_name")
+  sortOrder       Int      @default(0) @map("sort_order")
+  isPublished     Boolean  @default(true) @map("is_published")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("documents")
+}
+
+model Gallery {
+  id           String   @id @default(uuid())
+  schoolId     String?  @map("school_id")
+  school       School?  @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  title        String
+  imageUrl     String   @map("image_url")
+  thumbnailUrl String?  @map("thumbnail_url")
+  category     String
+  sortOrder    Int      @default(0) @map("sort_order")
+  isPublished  Boolean  @default(true) @map("is_published")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("gallery")
+}
+
+model Page {
+  id              String        @id @default(uuid())
+  slug            String        @unique
+  title           String
+  metaTitle       String?       @map("meta_title")
+  metaDescription String?       @map("meta_description")
+  isPublished     Boolean       @default(true) @map("is_published")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  sections        PageSection[]
+
+  @@map("pages")
+}
+
+model PageSection {
+  id          String   @id @default(uuid())
+  pageId      String   @map("page_id")
+  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  sectionType String   @map("section_type")
+  title       String?
+  content     String?
+  imageUrl    String?  @map("image_url")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isVisible   Boolean  @default(true) @map("is_visible")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("page_sections")
+}
+
+model SiteSetting {
+  key       String   @id
+  value     String   // JSON string
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+model Media {
+  id           String   @id @default(uuid())
+  filename     String
+  originalName String   @map("original_name")
+  mimeType     String   @map("mime_type")
+  sizeBytes    Int      @map("size_bytes")
+  url          String
+  thumbnailUrl String?  @map("thumbnail_url")
+  folder       String   @default("general")
+  uploadedById String?  @map("uploaded_by_id")
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("media")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  oldValues String?  @map("old_values") // JSON string
+  newValues String?  @map("new_values") // JSON string
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}

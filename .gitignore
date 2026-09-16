@@ -33,3 +33,8 @@ dist-ssr
 server/node_modules
 server/uploads/*
 !server/uploads/**/.gitkeep
+server/prisma/*.db
+server/prisma/*.db-journal
+server/prisma/*.db-wal
+server/prisma/*.db-shm
+
