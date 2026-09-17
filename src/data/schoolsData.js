@@ -80,7 +80,7 @@ export const schoolsData = [
   {
     id: 2,
     slug: 'boys-highschool',
-    icon3d: '/assets/icon-school4.png',
+    icon3d: '/assets/icon-school1.png',
     shortName: 'دبیرستان پسرانه',
     fullName: 'دبیرستان پسرانه قرآنی هدی (متوسطه اول، متوسطه دوم و کنکور)',
     subtitle: 'سرآمدی علمی، المپیادها و رتبه‌های تک‌رقمی کنکور در پرتو تهذیب نفس و معارف ثقلین',
@@ -166,7 +166,7 @@ export const schoolsData = [
   {
     id: 3,
     slug: 'girls-elementary',
-    icon3d: '/assets/icon-school2.png',
+    icon3d: '/assets/icon-school1.png',
     shortName: 'دبستان دخترانه',
     fullName: 'دبستان دخترانه قرآنی هدی (پیش‌دبستان و دوره اول و دوم ابتدایی)',
     subtitle: 'کانون آرامش، شادابی و حیا؛ پرورش نسلی دانا، خلاق و منور به نور کلام وحی',
@@ -244,7 +244,7 @@ export const schoolsData = [
   {
     id: 4,
     slug: 'girls-highschool',
-    icon3d: '/assets/icon-school3.png',
+    icon3d: '/assets/icon-school1.png',
     shortName: 'دبیرستان دخترانه',
     fullName: 'دبیرستان دخترانه قرآنی هدی (متوسطه اول، متوسطه دوم و کنکور)',
     subtitle: 'تربیت بانوان فرهیخته و نخبه علمی؛ درخشش در کنکور و المپیادها با هویتی متین و تمدن‌ساز',
