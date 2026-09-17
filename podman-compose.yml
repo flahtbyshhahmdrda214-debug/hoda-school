@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    container_name: hoda_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hoda_db}
+      POSTGRES_USER: ${POSTGRES_USER:-hoda_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-HodaSecurePass2026!#}
+    ports:
+      - "5432:5432"
+    volumes:
+      - hoda_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hoda_user} -d ${POSTGRES_DB:-hoda_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: hoda_backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      HOST: 0.0.0.0
+      DATABASE_URL: postgresql://${POSTGRES_USER:-hoda_user}:${POSTGRES_PASSWORD:-HodaSecurePass2026!#}@postgres:5432/${POSTGRES_DB:-hoda_db}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-hoda_complex_secure_jwt_token_secret_production_2026_super_key}
+      COOKIE_SECRET: ${COOKIE_SECRET:-hoda_complex_cookie_signer_secret_production_2026_super_key}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    volumes:
+      - hoda_uploads:/app/uploads
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hoda_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  hoda_pgdata:
+    driver: local
+  hoda_uploads:
+    driver: local
