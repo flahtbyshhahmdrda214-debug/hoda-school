@@ -94,6 +94,28 @@ export default function AdminSchools() {
             <h3 className="text-lg font-bold text-navy-950">ویرایش اطلاعات {editingSchool.shortName}</h3>
             
             <form onSubmit={handleSave} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">نام اختصاری مدرسه</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingSchool.shortName || ''}
+                    onChange={(e) => setEditingSchool({ ...editingSchool, shortName: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-turquoise-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">پایه تحصیلی / برچسب (Tag)</label>
+                  <input
+                    type="text"
+                    value={editingSchool.tag || ''}
+                    onChange={(e) => setEditingSchool({ ...editingSchool, tag: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-turquoise-500"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">نام کامل مدرسه</label>
                 <input

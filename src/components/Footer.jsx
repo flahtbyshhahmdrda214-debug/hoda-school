@@ -1,20 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Phone, 
   Mail, 
   MapPin, 
   Clock, 
-  BookOpen, 
   ArrowUp, 
   ShieldCheck, 
-  ExternalLink,
-  GraduationCap,
-  MessageCircle
+  GraduationCap
 } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
+import { fetchSchools } from '../services/schoolsService';
+import { fetchSettings } from '../services/settingsService';
+import { onDataChanged } from '../services/dataEvents';
 import Hoda3DLogo from './Hoda3DLogo';
 
 export default function Footer({ onSelectSchool }) {
+  const [schools, setSchools] = useState(schoolsData);
+  const [settings, setSettings] = useState({});
+
+  useEffect(() => {
+    fetchSchools().then(data => {
+      if (Array.isArray(data) && data.length > 0) setSchools(data);
+    });
+    fetchSettings().then(data => {
+      if (data) setSettings(data);
+    });
+
+    const unsub = onDataChanged(() => {
+      fetchSchools().then(data => {
+        if (Array.isArray(data) && data.length > 0) setSchools(data);
+      });
+      fetchSettings().then(data => {
+        if (data) setSettings(data);
+      });
+    });
+    return unsub;
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -35,7 +57,7 @@ export default function Footer({ onSelectSchool }) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {schoolsData.map((school) => (
+            {schools.map((school) => (
               <div
                 key={school.id}
                 className="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 hover:border-turquoise-500/50 transition-all flex flex-col justify-between"
@@ -98,16 +120,16 @@ export default function Footer({ onSelectSchool }) {
             <div>
               <span className="text-xs font-bold text-slate-300 block mb-2">کانال‌های رسمی در پیام‌رسان‌ها:</span>
               <div className="flex flex-wrap gap-2 text-xs">
-                <a href="#contact" className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-turquoise-600 text-slate-300 hover:text-white transition-colors border border-slate-700">
+                <a href={settings.socials?.eitaa || settings.social_eitaa || "https://eitaa.com/hodaschool"} target="_blank" rel="noreferrer" className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-turquoise-600 text-slate-300 hover:text-white transition-colors border border-slate-700">
                   کانال ایتا (Eitaa)
                 </a>
-                <a href="#contact" className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-turquoise-600 text-slate-300 hover:text-white transition-colors border border-slate-700">
+                <a href={settings.socials?.bale || settings.social_bale || "https://ble.ir/hodaschool"} target="_blank" rel="noreferrer" className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-turquoise-600 text-slate-300 hover:text-white transition-colors border border-slate-700">
                   پیام‌رسان بله (Bale)
                 </a>
-                <a href="#contact" className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-turquoise-600 text-slate-300 hover:text-white transition-colors border border-slate-700">
+                <a href={settings.socials?.shad || settings.social_shad || "https://shad.ir/hodaschool"} target="_blank" rel="noreferrer" className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-turquoise-600 text-slate-300 hover:text-white transition-colors border border-slate-700">
                   شاد (Shad)
                 </a>
-                <a href="#contact" className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-turquoise-600 text-slate-300 hover:text-white transition-colors border border-slate-700">
+                <a href={settings.socials?.aparat || settings.social_aparat || "https://aparat.com/hodaschool"} target="_blank" rel="noreferrer" className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-turquoise-600 text-slate-300 hover:text-white transition-colors border border-slate-700">
                   آپارات (Aparat)
                 </a>
               </div>
@@ -146,19 +168,19 @@ export default function Footer({ onSelectSchool }) {
             <div className="space-y-2.5 text-xs text-slate-400">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-turquoise-400 flex-shrink-0 mt-0.5" />
-                <span>تهران، خیابان شریعتی، بالاتر از پل رومی، ساختمان مرکزی مجتمع آموزشی قرآنی هدی</span>
+                <span>{settings.contact?.centralOfficeAddress || settings.central_address || 'تهران، خیابان پاسداران، بوستان پنجم، مجتمع مرکزی هدی'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-turquoise-400 flex-shrink-0" />
-                <span dir="ltr" className="font-mono text-slate-300">۰۲۱-۷۷۲۴۱۰۱۰ (۱۰ خط)</span>
+                <span dir="ltr" className="font-mono text-slate-300">{settings.contact?.centralOfficePhone || settings.central_phone || '۰۲۱-۷۷۲۴۱۰۰۰'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-turquoise-400 flex-shrink-0" />
-                <span className="font-mono text-slate-300">info@hoda-complex.ir</span>
+                <span className="font-mono text-slate-300">{settings.contact?.centralOfficeEmail || settings.central_email || 'info@hoda-complex.ir'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-turquoise-400 flex-shrink-0" />
-                <span>شنبه تا چهارشنبه: ۷:۳۰ الی ۱۵:۳۰ | پنج‌شنبه: ۸:۰۰ الی ۱۲:۳۰</span>
+                <span>{settings.contact?.workingHours || settings.working_hours || 'شنبه تا چهارشنبه ۷:۰۰ الی ۱۶:۰۰ | پنج‌شنبه‌ها ۷:۰۰ الی ۱۳:۰۰'}</span>
               </div>
             </div>
           </div>

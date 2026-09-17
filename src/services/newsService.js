@@ -1,5 +1,5 @@
 import { apiRequest } from './apiClient.js';
-import { newsData } from '../data/newsData.js';
+import { getLiveNews } from './mockStorage.js';
 
 export async function fetchNews(params = {}) {
   try {
@@ -8,11 +8,13 @@ export async function fetchNews(params = {}) {
     if (data && Array.isArray(data.items)) {
       return data.items;
     }
-    return newsData;
+    if (Array.isArray(data)) {
+      return data;
+    }
   } catch (err) {
-    console.warn('Backend API unreachable, using static fallback newsData:', err.message);
-    return newsData;
+    console.warn('API error in fetchNews, using persistent local storage:', err.message);
   }
+  return getLiveNews();
 }
 
 export async function fetchNewsBySlug(slug) {
@@ -20,10 +22,11 @@ export async function fetchNewsBySlug(slug) {
     const data = await apiRequest(`/public/news/${slug}`);
     if (data && data.slug) return data;
   } catch (err) {
-    console.warn(`Backend API unreachable for news ${slug}, using static fallback:`, err.message);
+    console.warn(`API error for news ${slug}, using persistent local storage:`, err.message);
   }
 
-  const fallback = newsData.find((n) => String(n.id) === slug || n.title?.includes(slug));
+  const allNews = getLiveNews();
+  const fallback = allNews.find((n) => String(n.id) === String(slug) || n.slug === slug || n.title?.includes(slug));
   if (fallback) return fallback;
   throw new Error('خبر مورد نظر یافت نشد');
 }

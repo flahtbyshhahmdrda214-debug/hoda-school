@@ -5,7 +5,7 @@ import { schoolsData } from '../data/schoolsData.js';
 import { newsData } from '../data/newsData.js';
 import { credentialsData } from '../data/credentialsData.js';
 
-const STORAGE_KEYS = {
+export const STORAGE_KEYS = {
   SCHOOLS: 'hoda_schools_db',
   NEWS: 'hoda_news_db',
   TEACHERS: 'hoda_teachers_db',
@@ -16,27 +16,95 @@ const STORAGE_KEYS = {
   AUDIT_LOGS: 'hoda_audit_logs_db',
 };
 
-function getItem(key, defaultVal) {
+export const DEFAULT_SETTINGS = {
+  general: {
+    siteName: 'مجتمع آموزشی قرآنی هدی',
+    establishedYear: '۱۳۸۵',
+    siteSubtitle: 'محیطی شاداب، پویا و امن؛ پیوند تربیت اصیل قرآنی با یادگیری خلاق',
+  },
+  contact: {
+    centralOfficePhone: '۰۲۱-۷۷۲۴۱۰۰۰',
+    centralOfficeEmail: 'info@hoda-complex.ir',
+    centralOfficeAddress: 'تهران، خیابان پاسداران، بوستان پنجم، مجتمع مرکزی هدی',
+    workingHours: 'شنبه تا چهارشنبه ۷:۰۰ الی ۱۶:۰۰ | پنج‌شنبه‌ها ۷:۰۰ الی ۱۳:۰۰',
+  },
+  socials: {
+    eitaa: 'https://eitaa.com/hodaschool',
+    bale: 'https://ble.ir/hodaschool',
+    shad: 'https://shad.ir/hodaschool',
+    aparat: 'https://aparat.com/hodaschool',
+  },
+  site_name: 'مجتمع آموزشی قرآنی هدی',
+  site_subtitle: 'محیطی شاداب، پویا و امن؛ پیوند تربیت اصیل قرآنی با یادگیری خلاق',
+  phone_boys_elem: '۰۲۱-۷۷۲۴۱۰۱۱',
+  phone_boys_high: '۰۲۱-۷۷۲۴۱۰۱۲',
+  phone_girls_elem: '۰۲۱-۷۷۲۴۱۰۱۳',
+  phone_girls_high: '۰۲۱-۷۷۲۴۱۰۱۴',
+  central_phone: '۰۲۱-۷۷۲۴۱۰۰۰',
+  central_email: 'info@hoda-complex.ir',
+  central_address: 'تهران، خیابان پاسداران، بوستان پنجم، مجتمع مرکزی هدی',
+  working_hours: 'شنبه تا چهارشنبه ۷:۰۰ الی ۱۶:۰۰ | پنج‌شنبه‌ها ۷:۰۰ الی ۱۳:۰۰',
+  social_eitaa: 'https://eitaa.com/hodaschool',
+  social_bale: 'https://ble.ir/hodaschool',
+  social_shad: 'https://shad.ir/hodaschool',
+  social_aparat: 'https://aparat.com/hodaschool',
+};
+
+export function getItem(key, defaultVal) {
   try {
     const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : defaultVal;
+    if (!raw) return defaultVal;
+    const parsed = JSON.parse(raw);
+    return parsed !== null && parsed !== undefined ? parsed : defaultVal;
   } catch {
     return defaultVal;
   }
 }
 
-function setItem(key, val) {
+export function setItem(key, val) {
   try {
     localStorage.setItem(key, JSON.stringify(val));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('hoda_data_changed', { detail: { key, val } }));
+    }
   } catch (err) {
     console.error('LocalStorage write error:', err);
   }
+}
+
+// Helper to merge live teachers and facilities into school objects
+function enrichSchool(school, allTeachers = [], allFacilities = []) {
+  if (!school) return school;
+  const sId = String(school.id);
+  const sSlug = school.slug;
+  const sName = school.shortName;
+
+  const teachers = allTeachers.filter(t => 
+    String(t.schoolId) === sId || 
+    t.schoolSlug === sSlug || 
+    t.schoolName === sName ||
+    (t.school && (String(t.school.id) === sId || t.school.shortName === sName))
+  );
+
+  const facilities = allFacilities.filter(f => 
+    String(f.schoolId) === sId || 
+    f.schoolSlug === sSlug || 
+    f.schoolName === sName ||
+    (f.school && (String(f.school.id) === sId || f.school.shortName === sName))
+  );
+
+  return {
+    ...school,
+    teachers: teachers.length > 0 ? teachers : (school.teachers || []),
+    facilities: facilities.length > 0 ? facilities : (school.facilities || []),
+  };
 }
 
 // Initializer
 export function initMockStorage() {
   if (typeof window === 'undefined') return;
 
+  // 1. Schools
   if (!localStorage.getItem(STORAGE_KEYS.SCHOOLS)) {
     setItem(STORAGE_KEYS.SCHOOLS, schoolsData.map(s => ({
       ...s,
@@ -46,25 +114,42 @@ export function initMockStorage() {
     })));
   }
 
+  // 2. News
   if (!localStorage.getItem(STORAGE_KEYS.NEWS)) {
     setItem(STORAGE_KEYS.NEWS, newsData.map(n => ({
       ...n,
       slug: n.slug || `news-${n.id}`,
-      contentHtml: n.content,
-      coverImageUrl: n.thumbnail,
+      summary: n.summary || '',
+      content: n.content || '',
+      contentHtml: n.content || '',
+      thumbnail: n.thumbnail || '/assets/campus-1.webp',
+      coverImageUrl: n.thumbnail || '/assets/campus-1.webp',
+      category: n.category || 'اطلاعیه مهم',
+      date: n.date || new Date().toLocaleDateString('fa-IR'),
+      publishedAt: new Date().toISOString(),
+      readTime: n.readTime || '۳ دقیقه',
+      isImportant: Boolean(n.isImportant),
+      isFeatured: Boolean(n.isImportant),
       isPublished: true,
-      publishedAt: new Date().toISOString()
+      badgeClass: n.badgeClass || 'bg-blue-50 text-blue-800 border-blue-200'
     })));
   }
 
+  // 3. Documents
   if (!localStorage.getItem(STORAGE_KEYS.DOCUMENTS)) {
     setItem(STORAGE_KEYS.DOCUMENTS, credentialsData.map(d => ({
       ...d,
+      code: d.code || `HOD-${d.id}`,
+      documentNumber: d.code || `HOD-${d.id}`,
+      issuer: d.issuer || 'سازمان آموزش و پرورش',
+      date: d.date || '۱۴۰۳',
+      type: d.type || 'تاییدیه رسمی',
       fileUrl: `/uploads/docs/${d.code || d.id}.pdf`,
       isPublished: true
     })));
   }
 
+  // 4. Teachers
   if (!localStorage.getItem(STORAGE_KEYS.TEACHERS)) {
     const allTeachers = [];
     const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
@@ -77,10 +162,16 @@ export function initMockStorage() {
             schoolName: sc.shortName,
             firstName: t.name ? t.name.split(' ')[0] : 'استاد',
             lastName: t.name ? t.name.split(' ').slice(1).join(' ') : 'محترم',
+            name: t.name || 'استاد محترم',
             roleTitle: t.role || '',
+            role: t.role || '',
             educationDegree: t.degree || '',
+            degree: t.degree || '',
             teachingExperience: t.experience || '',
-            avatarUrl: t.avatar || '',
+            experience: t.experience || '',
+            highlight: t.highlight || '',
+            avatarUrl: t.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+            avatar: t.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
             sortOrder: 1,
             school: { id: sc.id, shortName: sc.shortName }
           });
@@ -90,6 +181,7 @@ export function initMockStorage() {
     setItem(STORAGE_KEYS.TEACHERS, allTeachers);
   }
 
+  // 5. Facilities
   if (!localStorage.getItem(STORAGE_KEYS.FACILITIES)) {
     const allFacs = [];
     const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
@@ -99,8 +191,10 @@ export function initMockStorage() {
           allFacs.push({
             id: `fac-${Math.random().toString(36).substring(2, 9)}`,
             schoolId: sc.id,
+            schoolName: sc.shortName,
             title: f.title,
             description: f.desc || f.description || '',
+            desc: f.desc || f.description || '',
             school: { id: sc.id, shortName: sc.shortName }
           });
         }
@@ -109,25 +203,25 @@ export function initMockStorage() {
     setItem(STORAGE_KEYS.FACILITIES, allFacs);
   }
 
-  if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
-    setItem(STORAGE_KEYS.SETTINGS, {
-      site_name: 'مجتمع آموزشی قرآنی هدی',
-      site_subtitle: 'محیطی شاداب، پویا و امن؛ پیوند تربیت اصیل قرآنی با یادگیری خلاق',
-      phone_boys_elem: '۰۲۱-۷۷۲۴۱۰۱۱',
-      phone_boys_high: '۰۲۱-۷۷۲۴۱۰۱۲',
-      phone_girls_elem: '۰۲۱-۷۷۲۴۱۰۱۳',
-      phone_girls_high: '۰۲۱-۷۷۲۴۱۰۱۴',
-      central_phone: '۰۲۱-۷۷۲۴۱۰۰۰',
-      central_email: 'info@hoda-complex.ir',
-      central_address: 'تهران، خیابان پاسداران، بوستان پنجم، مجتمع مرکزی هدی',
-      working_hours: 'شنبه تا چهارشنبه ۷:۰۰ الی ۱۶:۰۰ | پنج‌شنبه‌ها ۷:۰۰ الی ۱۳:۰۰',
-      social_eitaa: 'https://eitaa.com/hodaschool',
-      social_bale: 'https://ble.ir/hodaschool',
-      social_shad: 'https://shad.ir/hodaschool',
-      social_aparat: 'https://aparat.com/hodaschool',
-    });
+  // 6. Settings
+  const existingSettings = getItem(STORAGE_KEYS.SETTINGS, null);
+  if (!existingSettings) {
+    setItem(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+  } else {
+    // Ensure section objects exist
+    if (!existingSettings.contact || !existingSettings.socials || !existingSettings.general) {
+      const merged = {
+        ...DEFAULT_SETTINGS,
+        ...existingSettings,
+        general: { ...DEFAULT_SETTINGS.general, ...(existingSettings.general || {}) },
+        contact: { ...DEFAULT_SETTINGS.contact, ...(existingSettings.contact || {}) },
+        socials: { ...DEFAULT_SETTINGS.socials, ...(existingSettings.socials || {}) },
+      };
+      setItem(STORAGE_KEYS.SETTINGS, merged);
+    }
   }
 
+  // 7. Media
   if (!localStorage.getItem(STORAGE_KEYS.MEDIA)) {
     setItem(STORAGE_KEYS.MEDIA, [
       { id: 'm1', filename: 'campus-1.webp', url: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=600&q=80', sizeBytes: 124500, createdAt: new Date().toISOString() },
@@ -136,6 +230,7 @@ export function initMockStorage() {
     ]);
   }
 
+  // 8. Audit Logs
   if (!localStorage.getItem(STORAGE_KEYS.AUDIT_LOGS)) {
     setItem(STORAGE_KEYS.AUDIT_LOGS, [
       { id: 'l1', action: 'SYSTEM_BOOT', entity: 'System', createdAt: new Date().toISOString(), ipAddress: '127.0.0.1', user: { fullName: 'مدیر کل سامانه', username: 'superadmin' } }
@@ -153,16 +248,23 @@ export function handleMockRequest(endpoint, options = {}) {
   // 1. Schools
   if (cleanEndpoint === '/schools') {
     const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
-    return schools;
+    const teachers = getItem(STORAGE_KEYS.TEACHERS, []);
+    const facs = getItem(STORAGE_KEYS.FACILITIES, []);
+    return schools.map(s => enrichSchool(s, teachers, facs));
   }
+
   if (cleanEndpoint.startsWith('/schools/')) {
     const slugOrId = cleanEndpoint.replace('/schools/', '');
     const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
-    const index = schools.findIndex(s => String(s.id) === slugOrId || s.slug === slugOrId);
+    const index = schools.findIndex(s => String(s.id) === String(slugOrId) || s.slug === slugOrId || (body.id && String(s.id) === String(body.id)) || (body.slug && s.slug === body.slug));
 
     if (method === 'GET') {
-      const sc = schools[index] || schools.find(s => s.slug === slugOrId);
-      if (sc) return sc;
+      const sc = (index !== -1 ? schools[index] : null) || schools.find(s => s.slug === slugOrId || String(s.id) === String(slugOrId));
+      if (sc) {
+        const teachers = getItem(STORAGE_KEYS.TEACHERS, []);
+        const facs = getItem(STORAGE_KEYS.FACILITIES, []);
+        return enrichSchool(sc, teachers, facs);
+      }
       throw new Error('مدرسه مورد نظر یافت نشد');
     }
 
@@ -171,7 +273,9 @@ export function handleMockRequest(endpoint, options = {}) {
         schools[index] = { ...schools[index], ...body };
         setItem(STORAGE_KEYS.SCHOOLS, schools);
         logAudit('UPDATE_SCHOOL', 'School', slugOrId);
-        return schools[index];
+        const teachers = getItem(STORAGE_KEYS.TEACHERS, []);
+        const facs = getItem(STORAGE_KEYS.FACILITIES, []);
+        return enrichSchool(schools[index], teachers, facs);
       }
       return body;
     }
@@ -189,11 +293,18 @@ export function handleMockRequest(endpoint, options = {}) {
         slug: body.slug || `news-${Date.now()}`,
         title: body.title || 'خبر جدید',
         summary: body.summary || '',
+        content: body.contentHtml || body.content || '',
         contentHtml: body.contentHtml || body.content || '',
-        category: body.category || 'عمومی',
-        coverImageUrl: body.coverImageUrl || body.thumbnail || '',
+        category: body.category || 'اطلاعیه مهم',
+        thumbnail: body.coverImageUrl || body.thumbnail || '/assets/campus-1.webp',
+        coverImageUrl: body.coverImageUrl || body.thumbnail || '/assets/campus-1.webp',
         publishedAt: new Date().toISOString(),
-        isPublished: true,
+        date: new Date().toLocaleDateString('fa-IR'),
+        readTime: body.readTime || '۳ دقیقه',
+        isPublished: body.isPublished !== undefined ? Boolean(body.isPublished) : true,
+        isFeatured: Boolean(body.isFeatured || body.isImportant),
+        isImportant: Boolean(body.isFeatured || body.isImportant),
+        badgeClass: body.badgeClass || 'bg-blue-50 text-blue-800 border-blue-200',
         school: null,
       };
       news.unshift(newItem);
@@ -202,15 +313,38 @@ export function handleMockRequest(endpoint, options = {}) {
       return newItem;
     }
   }
+
   if (cleanEndpoint.startsWith('/news/')) {
     const id = cleanEndpoint.replace('/news/', '');
     const news = getItem(STORAGE_KEYS.NEWS, newsData);
+    
     if (method === 'DELETE') {
       const filtered = news.filter(n => String(n.id) !== id && n.slug !== id);
       setItem(STORAGE_KEYS.NEWS, filtered);
       logAudit('DELETE_NEWS', 'News', id);
       return { success: true };
     }
+
+    if (method === 'PUT') {
+      const idx = news.findIndex(n => String(n.id) === id || n.slug === id);
+      if (idx !== -1) {
+        news[idx] = {
+          ...news[idx],
+          ...body,
+          thumbnail: body.coverImageUrl || body.thumbnail || news[idx].thumbnail,
+          coverImageUrl: body.coverImageUrl || body.thumbnail || news[idx].coverImageUrl,
+          content: body.contentHtml || body.content || news[idx].content,
+          contentHtml: body.contentHtml || body.content || news[idx].contentHtml,
+          isImportant: body.isFeatured !== undefined ? Boolean(body.isFeatured) : (body.isImportant !== undefined ? Boolean(body.isImportant) : news[idx].isImportant),
+          isFeatured: body.isFeatured !== undefined ? Boolean(body.isFeatured) : (body.isImportant !== undefined ? Boolean(body.isImportant) : news[idx].isFeatured),
+        };
+        setItem(STORAGE_KEYS.NEWS, news);
+        logAudit('UPDATE_NEWS', 'News', id);
+        return news[idx];
+      }
+      return body;
+    }
+
     if (method === 'GET') {
       const item = news.find(n => String(n.id) === id || n.slug === id);
       if (item) return item;
@@ -223,17 +357,26 @@ export function handleMockRequest(endpoint, options = {}) {
     const teachers = getItem(STORAGE_KEYS.TEACHERS, []);
     if (method === 'GET') return teachers;
     if (method === 'POST') {
+      const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
+      const sc = schools.find(s => String(s.id) === String(body.schoolId)) || schools[0];
       const newTeacher = {
         id: `teacher-${Date.now()}`,
-        schoolId: body.schoolId,
+        schoolId: sc ? sc.id : body.schoolId,
+        schoolName: sc ? sc.shortName : '',
         firstName: body.firstName || '',
         lastName: body.lastName || '',
+        name: `${body.firstName || ''} ${body.lastName || ''}`.trim(),
         roleTitle: body.roleTitle || body.role || '',
+        role: body.roleTitle || body.role || '',
         educationDegree: body.educationDegree || body.degree || '',
+        degree: body.educationDegree || body.degree || '',
         teachingExperience: body.teachingExperience || body.experience || '',
-        avatarUrl: body.avatarUrl || '',
+        experience: body.teachingExperience || body.experience || '',
+        highlight: body.highlight || '',
+        avatarUrl: body.avatarUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
+        avatar: body.avatarUrl || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
         sortOrder: Number(body.sortOrder) || 1,
-        school: { id: body.schoolId, shortName: 'مدرسه' }
+        school: sc ? { id: sc.id, shortName: sc.shortName } : null
       };
       teachers.push(newTeacher);
       setItem(STORAGE_KEYS.TEACHERS, teachers);
@@ -241,6 +384,7 @@ export function handleMockRequest(endpoint, options = {}) {
       return newTeacher;
     }
   }
+
   if (cleanEndpoint.startsWith('/teachers/')) {
     const id = cleanEndpoint.replace('/teachers/', '');
     const teachers = getItem(STORAGE_KEYS.TEACHERS, []);
@@ -257,12 +401,16 @@ export function handleMockRequest(endpoint, options = {}) {
     const facs = getItem(STORAGE_KEYS.FACILITIES, []);
     if (method === 'GET') return facs;
     if (method === 'POST') {
+      const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
+      const sc = schools.find(s => String(s.id) === String(body.schoolId)) || schools[0];
       const newFac = {
         id: `fac-${Date.now()}`,
-        schoolId: body.schoolId,
+        schoolId: sc ? sc.id : body.schoolId,
+        schoolName: sc ? sc.shortName : '',
         title: body.title,
-        description: body.description || '',
-        school: { id: body.schoolId, shortName: 'مدرسه' }
+        description: body.description || body.desc || '',
+        desc: body.description || body.desc || '',
+        school: sc ? { id: sc.id, shortName: sc.shortName } : null
       };
       facs.push(newFac);
       setItem(STORAGE_KEYS.FACILITIES, facs);
@@ -270,6 +418,7 @@ export function handleMockRequest(endpoint, options = {}) {
       return newFac;
     }
   }
+
   if (cleanEndpoint.startsWith('/facilities/')) {
     const id = cleanEndpoint.replace('/facilities/', '');
     const facs = getItem(STORAGE_KEYS.FACILITIES, []);
@@ -288,12 +437,17 @@ export function handleMockRequest(endpoint, options = {}) {
     if (method === 'POST') {
       const newDoc = {
         id: `doc-${Date.now()}`,
+        code: body.code || body.documentNumber || `HOD-${Date.now().toString().slice(-6)}`,
+        documentNumber: body.code || body.documentNumber || `HOD-${Date.now().toString().slice(-6)}`,
         title: body.title,
         description: body.description || '',
         issuer: body.issuer || 'مجتمع آموزشی قرآنی هدی',
+        date: body.date || new Date().toLocaleDateString('fa-IR'),
+        type: body.type || 'تاییدیه رسمی',
         fileUrl: body.fileUrl || '/uploads/doc.pdf',
-        icon: body.iconName || 'ShieldCheck',
-        badgeColor: 'blue'
+        icon: body.iconName || body.icon || 'ShieldCheck',
+        badgeColor: body.badgeColor || 'blue',
+        isPublished: true,
       };
       docs.unshift(newDoc);
       setItem(STORAGE_KEYS.DOCUMENTS, docs);
@@ -301,11 +455,12 @@ export function handleMockRequest(endpoint, options = {}) {
       return newDoc;
     }
   }
+
   if (cleanEndpoint.startsWith('/documents/')) {
     const id = cleanEndpoint.replace('/documents/', '');
     const docs = getItem(STORAGE_KEYS.DOCUMENTS, credentialsData);
     if (method === 'DELETE') {
-      const filtered = docs.filter(d => String(d.id) !== id);
+      const filtered = docs.filter(d => String(d.id) !== id && String(d.code) !== id);
       setItem(STORAGE_KEYS.DOCUMENTS, filtered);
       logAudit('DELETE_DOCUMENT', 'Document', id);
       return { success: true };
@@ -314,20 +469,52 @@ export function handleMockRequest(endpoint, options = {}) {
 
   // 6. Settings
   if (cleanEndpoint === '/settings') {
-    const settings = getItem(STORAGE_KEYS.SETTINGS, {});
-    if (method === 'GET') return settings;
+    const settings = getItem(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+    if (method === 'GET') {
+      return {
+        ...DEFAULT_SETTINGS,
+        ...settings,
+        general: { ...DEFAULT_SETTINGS.general, ...(settings.general || {}) },
+        contact: { ...DEFAULT_SETTINGS.contact, ...(settings.contact || {}) },
+        socials: { ...DEFAULT_SETTINGS.socials, ...(settings.socials || {}) },
+      };
+    }
     if (method === 'PUT') {
-      const updated = { ...settings, ...body };
+      const current = getItem(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+      const updated = {
+        ...current,
+        ...body,
+        general: { ...(current.general || {}), ...(body.general || {}) },
+        contact: { ...(current.contact || {}), ...(body.contact || {}) },
+        socials: { ...(current.socials || {}), ...(body.socials || {}) },
+      };
       setItem(STORAGE_KEYS.SETTINGS, updated);
       logAudit('UPDATE_SETTINGS', 'SiteSetting', 'all');
       return updated;
     }
   }
+
   if (cleanEndpoint.startsWith('/settings/')) {
     const key = cleanEndpoint.replace('/settings/', '');
-    const settings = getItem(STORAGE_KEYS.SETTINGS, {});
+    const settings = getItem(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+    if (method === 'GET') {
+      return settings[key] !== undefined ? settings[key] : (DEFAULT_SETTINGS[key] || null);
+    }
     if (method === 'PUT') {
-      settings[key] = body.value !== undefined ? body.value : body;
+      const val = body.value !== undefined ? body.value : body;
+      settings[key] = val;
+      if (key === 'contact' && typeof val === 'object') {
+        if (val.centralOfficePhone) settings.central_phone = val.centralOfficePhone;
+        if (val.centralOfficeEmail) settings.central_email = val.centralOfficeEmail;
+        if (val.centralOfficeAddress) settings.central_address = val.centralOfficeAddress;
+        if (val.workingHours) settings.working_hours = val.workingHours;
+      }
+      if (key === 'socials' && typeof val === 'object') {
+        if (val.eitaa) settings.social_eitaa = val.eitaa;
+        if (val.bale) settings.social_bale = val.bale;
+        if (val.shad) settings.social_shad = val.shad;
+        if (val.aparat) settings.social_aparat = val.aparat;
+      }
       setItem(STORAGE_KEYS.SETTINGS, settings);
       logAudit('UPDATE_SETTING', 'SiteSetting', key);
       return { key, value: settings[key] };
@@ -430,7 +617,6 @@ export function handleMockRequest(endpoint, options = {}) {
     return { success: true };
   }
 
-  // Default fallback
   return { success: true };
 }
 
@@ -444,8 +630,39 @@ function logAudit(action, entity, entityId) {
       entityId: String(entityId),
       createdAt: new Date().toISOString(),
       ipAddress: '127.0.0.1',
-      user: { fullName: 'مدیر سامانه (Cloudflare Session)', username: 'superadmin' }
+      user: { fullName: 'مدیر سامانه', username: 'admin' }
     });
     setItem(STORAGE_KEYS.AUDIT_LOGS, logs.slice(0, 100));
   } catch {}
+}
+
+// Direct Live Readers for UI Components
+export function getLiveSchools() {
+  initMockStorage();
+  const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
+  const teachers = getItem(STORAGE_KEYS.TEACHERS, []);
+  const facs = getItem(STORAGE_KEYS.FACILITIES, []);
+  return schools.map(s => enrichSchool(s, teachers, facs));
+}
+
+export function getLiveNews() {
+  initMockStorage();
+  return getItem(STORAGE_KEYS.NEWS, newsData);
+}
+
+export function getLiveDocuments() {
+  initMockStorage();
+  return getItem(STORAGE_KEYS.DOCUMENTS, credentialsData);
+}
+
+export function getLiveSettings() {
+  initMockStorage();
+  const s = getItem(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+  return {
+    ...DEFAULT_SETTINGS,
+    ...s,
+    general: { ...DEFAULT_SETTINGS.general, ...(s.general || {}) },
+    contact: { ...DEFAULT_SETTINGS.contact, ...(s.contact || {}) },
+    socials: { ...DEFAULT_SETTINGS.socials, ...(s.socials || {}) },
+  };
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Calendar, Clock, Tag, Share2, ArrowLeft } from 'lucide-react';
+import { X, Calendar, Clock } from 'lucide-react';
 
 export default function NewsModal({ news, onClose }) {
   if (!news) return null;
@@ -13,7 +13,7 @@ export default function NewsModal({ news, onClose }) {
         {/* News Hero Banner */}
         <div className="relative h-64 sm:h-72 w-full flex-shrink-0">
           <img
-            src={news.thumbnail}
+            src={news.thumbnail || news.coverImageUrl || '/assets/campus-1.webp'}
             alt={news.title}
             className="w-full h-full object-cover"
           />
@@ -29,7 +29,7 @@ export default function NewsModal({ news, onClose }) {
 
           {/* Title on image */}
           <div className="absolute bottom-4 right-4 left-4 text-white">
-            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-2 shadow ${news.badgeClass}`}>
+            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-2 shadow ${news.badgeClass || 'bg-blue-50 text-blue-800 border-blue-200'}`}>
               {news.category}
             </span>
             <h3 className="text-lg sm:text-2xl font-black leading-snug">
@@ -38,11 +38,11 @@ export default function NewsModal({ news, onClose }) {
             <div className="flex items-center gap-4 text-xs text-slate-300 mt-2">
               <span className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-turquoise-400" />
-                {news.date}
+                {news.date || (news.publishedAt ? new Date(news.publishedAt).toLocaleDateString('fa-IR') : 'به‌روز')}
               </span>
               <span className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5 text-slate-400" />
-                زمان مطالعه: {news.readTime}
+                زمان مطالعه: {news.readTime || '۳ دقیقه'}
               </span>
             </div>
           </div>
@@ -50,12 +50,14 @@ export default function NewsModal({ news, onClose }) {
 
         {/* News Content Body */}
         <div className="p-6 sm:p-8 overflow-y-auto flex-1 space-y-6">
-          <div className="p-4 rounded-2xl bg-turquoise-50/50 border border-turquoise-100 text-slate-700 text-sm font-semibold leading-relaxed">
-            {news.summary}
-          </div>
+          {news.summary && (
+            <div className="p-4 rounded-2xl bg-turquoise-50/50 border border-turquoise-100 text-slate-700 text-sm font-semibold leading-relaxed">
+              {news.summary}
+            </div>
+          )}
 
           <div className="text-sm sm:text-base text-slate-700 leading-loose space-y-4">
-            <p>{news.content}</p>
+            <div dangerouslySetInnerHTML={{ __html: news.contentHtml || news.content || '' }} />
             <p>
               مجتمع آموزشی قرآنی هدی همواره در تلاش است تا با بهره‌گیری از اساتید فرهیخته، جدیدترین ابزارهای کمک‌آموزشی و فضایی مبتنی بر آموزه‌های نورانی وحی، بستری ممتاز برای رشد همه‌جانبه فرزندان این مرز و بوم پدید آورد.
             </p>

@@ -3,9 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { fetchSchoolBySlug } from '../services/schoolsService';
+import { onDataChanged } from '../services/dataEvents';
 import { 
   Building2, BookOpen, Award, Users, MapPin, Phone, Mail, 
-  ArrowRight, CheckCircle2, Star, Sparkles, Trophy 
+  ArrowRight, CheckCircle2, Sparkles, Trophy 
 } from 'lucide-react';
 
 export default function SchoolDetailPage() {
@@ -17,16 +18,22 @@ export default function SchoolDetailPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setLoading(true);
-    fetchSchoolBySlug(slug)
-      .then((data) => {
-        setSchool(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err.message);
-      })
-      .finally(() => setLoading(false));
+    const load = () => {
+      fetchSchoolBySlug(slug)
+        .then((data) => {
+          setSchool(data);
+          setError(null);
+        })
+        .catch((err) => {
+          setError(err.message);
+        })
+        .finally(() => setLoading(false));
+    };
+    load();
+    const unsub = onDataChanged(() => {
+      load();
+    });
+    return unsub;
   }, [slug]);
 
   if (loading) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiRequest } from '../../services/apiClient';
-import { Users, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 export default function AdminTeachers() {
   const [teachers, setTeachers] = useState([]);
@@ -17,10 +17,6 @@ export default function AdminTeachers() {
     avatarUrl: '',
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
     const [t, s] = await Promise.all([
       apiRequest('/teachers'),
@@ -32,6 +28,10 @@ export default function AdminTeachers() {
       setForm((prev) => ({ ...prev, schoolId: s[0].id }));
     }
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleCreate = async (e) => {
     e.preventDefault();

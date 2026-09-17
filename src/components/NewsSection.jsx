@@ -1,25 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Newspaper, 
   Calendar, 
   Clock, 
   ArrowLeft, 
-  Sparkles, 
-  AlertCircle,
-  Tag
+  AlertCircle
 } from 'lucide-react';
 import { newsData } from '../data/newsData';
+import { fetchNews } from '../services/newsService';
+import { onDataChanged } from '../services/dataEvents';
 
 export default function NewsSection({ onSelectNews }) {
   const [activeCategory, setActiveCategory] = useState('همه');
+  const [news, setNews] = useState(newsData);
+
+  useEffect(() => {
+    fetchNews().then(items => {
+      if (Array.isArray(items) && items.length > 0) setNews(items);
+    });
+    const unsub = onDataChanged(() => {
+      fetchNews().then(items => {
+        if (Array.isArray(items) && items.length > 0) setNews(items);
+      });
+    });
+    return unsub;
+  }, []);
 
   const categories = ['همه', 'اطلاعیه مهم', 'افتخارات قرآنی', 'توسعه فناوری', 'رویداد و آموزش خانواده'];
 
+  const publishedNews = news.filter(item => item.isPublished !== false);
   const filteredNews = activeCategory === 'همه'
-    ? newsData
-    : newsData.filter(item => item.category === activeCategory);
+    ? publishedNews
+    : publishedNews.filter(item => item.category === activeCategory);
 
-  const importantNews = newsData.find(item => item.isImportant) || newsData[0];
+  const importantNews = publishedNews.find(item => item.isImportant || item.isFeatured) || publishedNews[0];
 
   return (
     <section id="news" className="py-16 sm:py-20 bg-slate-50 relative">
@@ -64,7 +78,7 @@ export default function NewsSection({ onSelectNews }) {
             {/* Image Column */}
             <div className="lg:col-span-5 relative h-64 lg:h-auto overflow-hidden">
               <img
-                src={importantNews.thumbnail}
+                src={importantNews.thumbnail || importantNews.coverImageUrl || '/assets/campus-1.webp'}
                 alt={importantNews.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -78,16 +92,16 @@ export default function NewsSection({ onSelectNews }) {
             <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
               <div>
                 <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mb-3">
-                  <span className={`px-2.5 py-1 rounded-lg font-bold border ${importantNews.badgeClass}`}>
+                  <span className={`px-2.5 py-1 rounded-lg font-bold border ${importantNews.badgeClass || 'bg-blue-50 text-blue-800 border-blue-200'}`}>
                     {importantNews.category}
                   </span>
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-turquoise-600" />
-                    {importantNews.date}
+                    {importantNews.date || (importantNews.publishedAt ? new Date(importantNews.publishedAt).toLocaleDateString('fa-IR') : 'به‌روز')}
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    زمان مطالعه: {importantNews.readTime}
+                    زمان مطالعه: {importantNews.readTime || '۳ دقیقه'}
                   </span>
                 </div>
 
@@ -105,7 +119,7 @@ export default function NewsSection({ onSelectNews }) {
 
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-xs text-slate-600">
-                  ثبت‌نام سال تحصیلی ۱۴۰۴-۱۴۰۵
+                  اطلاعیه رسمی مجتمع هدی
                 </span>
                 <button
                   onClick={() => onSelectNews(importantNews)}
@@ -130,11 +144,11 @@ export default function NewsSection({ onSelectNews }) {
                 {/* Thumbnail */}
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={item.thumbnail}
+                    src={item.thumbnail || item.coverImageUrl || '/assets/campus-1.webp'}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <span className={`absolute top-3 right-3 px-2.5 py-0.5 rounded-full text-xs font-bold backdrop-blur-md bg-white/90 shadow ${item.badgeClass}`}>
+                  <span className={`absolute top-3 right-3 px-2.5 py-0.5 rounded-full text-xs font-bold backdrop-blur-md bg-white/90 shadow ${item.badgeClass || 'bg-slate-100 text-slate-700 border-slate-200'}`}>
                     {item.category}
                   </span>
                 </div>
@@ -144,7 +158,7 @@ export default function NewsSection({ onSelectNews }) {
                   <div className="flex items-center gap-3 text-[11px] text-slate-500 mb-2">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3 h-3 text-turquoise-600" />
-                      {item.date}
+                      {item.date || (item.publishedAt ? new Date(item.publishedAt).toLocaleDateString('fa-IR') : 'به‌روز')}
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3 text-slate-400" />

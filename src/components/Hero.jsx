@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, Sparkles, GraduationCap, PhoneCall, ArrowLeft, BookOpen } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
+import { fetchSchools } from '../services/schoolsService';
+import { onDataChanged } from '../services/dataEvents';
 import Hoda3DLogo from './Hoda3DLogo';
 
 export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentity }) {
+  const [schools, setSchools] = useState(schoolsData);
+
+  useEffect(() => {
+    fetchSchools().then(data => {
+      if (Array.isArray(data) && data.length > 0) setSchools(data);
+    });
+    const unsub = onDataChanged(() => {
+      fetchSchools().then(data => {
+        if (Array.isArray(data) && data.length > 0) setSchools(data);
+      });
+    });
+    return unsub;
+  }, []);
+
   const schoolStyles = {
     1: {
       text: 'text-white',
@@ -85,8 +101,8 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
 
         {/* 4 Borderless Floating 3D School Portals */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 max-w-5xl mx-auto my-1 sm:my-2">
-          {schoolsData.map((school) => {
-            const style = schoolStyles[school.id];
+          {schools.map((school) => {
+            const style = schoolStyles[school.id] || schoolStyles[1];
             return (
               <button
                 key={school.id}
@@ -103,7 +119,7 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
 
                   {/* 3D Icon with Levitation and Hover Tilt */}
                   <img
-                    src={school.icon3d}
+                    src={school.icon3d || school.icon3dUrl}
                     alt={school.shortName}
                     className={`w-full h-full object-contain filter drop-shadow-[0_14px_24px_rgba(0,0,0,0.35)] transition-transform duration-500 ease-out group-hover:scale-120 group-hover:-translate-y-2 pointer-events-none ${style.floatAnim}`}
                   />
@@ -118,7 +134,7 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
 
                   {/* Sleek Floating Capsule Pill - Frosted Dark Glass for 100% Readability */}
                   <span className={`mt-1.5 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-bold text-slate-100 bg-slate-950/70 hover:bg-slate-900/90 backdrop-blur-md border ${style.badgeBorder} shadow-xl group-hover:text-white transition-all duration-300`}>
-                    <span>{school.tag.split('(')[0].trim()}</span>
+                    <span>{(school.tag || school.shortName || '').split('(')[0].trim()}</span>
                     <ArrowLeft className="w-3 h-3 text-turquoise-400 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-300" />
                   </span>
                 </div>

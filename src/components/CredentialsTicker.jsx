@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   Award, 
@@ -11,6 +11,8 @@ import {
   BadgeCheck
 } from 'lucide-react';
 import { credentialsData } from '../data/credentialsData';
+import { fetchDocuments } from '../services/documentsService';
+import { onDataChanged } from '../services/dataEvents';
 
 const iconMap = {
   ShieldCheck,
@@ -23,8 +25,22 @@ const iconMap = {
 };
 
 export default function CredentialsTicker({ onSelectCredential }) {
+  const [docs, setDocs] = useState(credentialsData);
+
+  useEffect(() => {
+    fetchDocuments().then(data => {
+      if (Array.isArray(data) && data.length > 0) setDocs(data);
+    });
+    const unsub = onDataChanged(() => {
+      fetchDocuments().then(data => {
+        if (Array.isArray(data) && data.length > 0) setDocs(data);
+      });
+    });
+    return unsub;
+  }, []);
+
   // We duplicate the list to make seamless continuous loop marquee
-  const tickerItems = [...credentialsData, ...credentialsData];
+  const tickerItems = [...docs, ...docs];
 
   return (
     <section id="credentials-section" className="py-8 bg-slate-900 border-y border-slate-800 text-white overflow-hidden relative">
@@ -81,10 +97,10 @@ export default function CredentialsTicker({ onSelectCredential }) {
                 <div className="flex-1 min-w-0 text-right">
                   <div className="flex items-center justify-between gap-1">
                     <span className="text-[10px] font-mono text-turquoise-300/80 tracking-wider">
-                      {item.code}
+                      {item.code || item.documentNumber || 'HOD'}
                     </span>
                     <span className="text-[10px] text-slate-400">
-                      {item.date.split('(')[0]}
+                      {item.date ? item.date.split('(')[0] : '۱۴۰۳'}
                     </span>
                   </div>
                   <h4 className="text-sm font-bold text-white truncate group-hover:text-turquoise-300 transition-colors">

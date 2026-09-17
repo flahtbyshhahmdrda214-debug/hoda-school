@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { fetchNewsBySlug } from '../services/newsService';
-import { Calendar, ArrowRight, Share2, Eye, Tag } from 'lucide-react';
+import { Calendar, ArrowRight, Eye } from 'lucide-react';
+import { onDataChanged } from '../services/dataEvents';
 
 export default function NewsDetailPage() {
   const { slug } = useParams();
@@ -13,16 +14,21 @@ export default function NewsDetailPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setLoading(true);
-    fetchNewsBySlug(slug)
-      .then((data) => {
-        setArticle(data);
-        setError(null);
-      })
-      .catch((err) => {
-        setError(err.message);
-      })
-      .finally(() => setLoading(false));
+    const load = () => {
+      fetchNewsBySlug(slug)
+        .then((data) => {
+          setArticle(data);
+          setError(null);
+        })
+        .catch((err) => {
+          setError(err.message);
+        })
+        .finally(() => setLoading(false));
+    };
+
+    load();
+    const unsub = onDataChanged(load);
+    return () => unsub();
   }, [slug]);
 
   if (loading) {

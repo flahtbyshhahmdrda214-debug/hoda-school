@@ -3,7 +3,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CertificateModal from '../components/CertificateModal';
 import { fetchDocuments } from '../services/documentsService';
-import { ShieldCheck, Award, BookOpen, CheckCircle2, Trophy, Sparkles, Laptop, FileText } from 'lucide-react';
+import { ShieldCheck, Award, BookOpen, CheckCircle2, Trophy, Sparkles, Laptop } from 'lucide-react';
+import { onDataChanged } from '../services/dataEvents';
 
 const ICON_MAP = {
   ShieldCheck,
@@ -22,9 +23,15 @@ export default function CredentialsPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchDocuments()
-      .then((items) => setDocuments(items))
-      .finally(() => setLoading(false));
+    const load = () => {
+      fetchDocuments()
+        .then((items) => setDocuments(items))
+        .finally(() => setLoading(false));
+    };
+
+    load();
+    const unsub = onDataChanged(load);
+    return () => unsub();
   }, []);
 
   return (

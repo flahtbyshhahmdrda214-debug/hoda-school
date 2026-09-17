@@ -1,5 +1,5 @@
 import { apiRequest } from './apiClient.js';
-import { schoolsData } from '../data/schoolsData.js';
+import { getLiveSchools } from './mockStorage.js';
 
 export async function fetchSchools() {
   try {
@@ -7,11 +7,10 @@ export async function fetchSchools() {
     if (Array.isArray(data) && data.length > 0) {
       return data;
     }
-    return schoolsData;
   } catch (err) {
-    console.warn('Backend API unreachable, using static fallback schoolsData:', err.message);
-    return schoolsData;
+    console.warn('API error in fetchSchools, using persistent local storage:', err.message);
   }
+  return getLiveSchools();
 }
 
 export async function fetchSchoolBySlug(slug) {
@@ -21,10 +20,11 @@ export async function fetchSchoolBySlug(slug) {
       return data;
     }
   } catch (err) {
-    console.warn(`Backend API unreachable for school ${slug}, using static fallback:`, err.message);
+    console.warn(`API error for school ${slug}, using persistent local storage:`, err.message);
   }
 
-  const fallback = schoolsData.find((s) => s.slug === slug);
-  if (fallback) return fallback;
+  const schools = getLiveSchools();
+  const found = schools.find((s) => s.slug === slug || String(s.id) === String(slug));
+  if (found) return found;
   throw new Error('مدرسه مورد نظر یافت نشد');
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiRequest } from '../../services/apiClient';
-import { Building2, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 export default function AdminFacilities() {
   const [facilities, setFacilities] = useState([]);
@@ -8,16 +8,16 @@ export default function AdminFacilities() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form, setForm] = useState({ schoolId: '', title: '', description: '' });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
     const [f, s] = await Promise.all([apiRequest('/facilities'), apiRequest('/schools')]);
     setFacilities(f || []);
     setSchools(s || []);
     if (s && s.length > 0) setForm(prev => ({ ...prev, schoolId: s[0].id }));
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const handleCreate = async (e) => {
     e.preventDefault();

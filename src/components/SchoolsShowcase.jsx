@@ -1,15 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   GraduationCap, 
   Users, 
   Trophy, 
   ArrowLeft, 
-  Sparkles,
-  BookOpen
+  Sparkles, 
+  BookOpen 
 } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
+import { fetchSchools } from '../services/schoolsService';
+import { onDataChanged } from '../services/dataEvents';
 
 export default function SchoolsShowcase({ onSelectSchool }) {
+  const [schools, setSchools] = useState(schoolsData);
+
+  useEffect(() => {
+    fetchSchools().then(data => {
+      if (Array.isArray(data) && data.length > 0) setSchools(data);
+    });
+    const unsub = onDataChanged(() => {
+      fetchSchools().then(data => {
+        if (Array.isArray(data) && data.length > 0) setSchools(data);
+      });
+    });
+    return unsub;
+  }, []);
   const badgeVariants = {
     1: {
       headerGradient: 'from-blue-700 to-indigo-800',
@@ -65,8 +80,12 @@ export default function SchoolsShowcase({ onSelectSchool }) {
 
         {/* 4 Schools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {schoolsData.map((school) => {
-            const v = badgeVariants[school.id];
+          {schools.map((school) => {
+            const v = badgeVariants[school.id] || badgeVariants[1];
+            const teachersCount = Array.isArray(school.teachers) ? school.teachers.length : 0;
+            const honorsCount = Array.isArray(school.honors || school.achievements) ? (school.honors || school.achievements).length : 0;
+            const features = school.quranicProgram?.features || [];
+
             return (
               <div
                 key={school.id}
@@ -89,7 +108,7 @@ export default function SchoolsShowcase({ onSelectSchool }) {
                       {/* Free-Floating 3D clay icon in banner with motion */}
                       <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center flex-shrink-0">
                         <img
-                          src={school.icon3d}
+                          src={school.icon3d || school.icon3dUrl}
                           alt={school.shortName}
                           className="w-full h-full object-contain filter drop-shadow-[0_12px_20px_rgba(0,0,0,0.3)] transform group-hover:scale-115 group-hover:-translate-y-1 transition-transform duration-500 pointer-events-none"
                         />
@@ -104,18 +123,20 @@ export default function SchoolsShowcase({ onSelectSchool }) {
                   {/* Body Content */}
                   <div className="p-6">
                     {/* Key Stats Bar */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200/80 mb-6">
-                      {school.stats.map((st, i) => (
-                        <div key={i} className="text-center">
-                          <div className={`text-base sm:text-lg font-black ${v.accentColor}`}>
-                            {st.value}
+                    {Array.isArray(school.stats) && school.stats.length > 0 && (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200/80 mb-6">
+                        {school.stats.map((st, i) => (
+                          <div key={i} className="text-center">
+                            <div className={`text-base sm:text-lg font-black ${v.accentColor}`}>
+                              {st.value}
+                            </div>
+                            <div className="text-[11px] text-slate-500 font-medium">
+                              {st.label}
+                            </div>
                           </div>
-                          <div className="text-[11px] text-slate-500 font-medium">
-                            {st.label}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Overview Paragraph */}
                     <p className="text-sm text-slate-600 leading-relaxed mb-6">
@@ -123,30 +144,34 @@ export default function SchoolsShowcase({ onSelectSchool }) {
                     </p>
 
                     {/* Quranic Feature Highlight */}
-                    <div className="p-4 rounded-2xl bg-turquoise-50/50 border border-turquoise-100 mb-6">
-                      <div className="flex items-center gap-2 text-turquoise-800 font-bold text-xs sm:text-sm mb-2">
-                        <BookOpen className="w-4 h-4 text-turquoise-600" />
-                        {school.quranicProgram.title}
+                    {school.quranicProgram && (
+                      <div className="p-4 rounded-2xl bg-turquoise-50/50 border border-turquoise-100 mb-6">
+                        <div className="flex items-center gap-2 text-turquoise-800 font-bold text-xs sm:text-sm mb-2">
+                          <BookOpen className="w-4 h-4 text-turquoise-600" />
+                          {school.quranicProgram.title || school.quranicProgramTitle || 'طرح قرآنی رویش نور'}
+                        </div>
+                        {features.length > 0 && (
+                          <ul className="space-y-1.5 text-xs text-slate-600">
+                            {features.slice(0, 2).map((feat, idx) => (
+                              <li key={idx} className="flex items-start gap-2">
+                                <span className="text-turquoise-600 mt-0.5">•</span>
+                                <span>{feat}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
-                      <ul className="space-y-1.5 text-xs text-slate-600">
-                        {school.quranicProgram.features.slice(0, 2).map((feat, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <span className="text-turquoise-600 mt-0.5">•</span>
-                            <span>{feat}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    )}
 
                     {/* Highlights of Teachers & Honors */}
                     <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
                       <span className="flex items-center gap-1.5 font-medium">
                         <Users className="w-4 h-4 text-slate-400" />
-                        معرفی {school.teachers.length} استاد و معلم برجسته
+                        معرفی {teachersCount} استاد و معلم برجسته
                       </span>
                       <span className="flex items-center gap-1.5 font-medium">
                         <Trophy className="w-4 h-4 text-amber-500" />
-                        {school.honors.length} دستاورد و افتخار ثبت شده
+                        {honorsCount} دستاورد و افتخار ثبت شده
                       </span>
                     </div>
                   </div>

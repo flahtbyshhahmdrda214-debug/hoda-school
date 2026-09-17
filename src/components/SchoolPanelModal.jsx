@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Building2, 
@@ -16,17 +16,37 @@ import {
   Send
 } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
+import { fetchSchools } from '../services/schoolsService';
+import { onDataChanged } from '../services/dataEvents';
 
 export default function SchoolPanelModal({ school, onClose, onSelectSchool }) {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'teachers' | 'honors'
+  const [schools, setSchools] = useState(schoolsData);
+
+  useEffect(() => {
+    fetchSchools().then(data => {
+      if (Array.isArray(data) && data.length > 0) setSchools(data);
+    });
+    const unsub = onDataChanged(() => {
+      fetchSchools().then(data => {
+        if (Array.isArray(data) && data.length > 0) setSchools(data);
+      });
+    });
+    return unsub;
+  }, []);
 
   if (!school) return null;
 
+  const teachersCount = Array.isArray(school.teachers) ? school.teachers.length : 0;
+  const honorsCount = Array.isArray(school.honors || school.achievements) ? (school.honors || school.achievements).length : 0;
+
   const tabs = [
     { id: 'overview', label: 'معرفی مجموعه و امکانات', icon: Building2 },
-    { id: 'teachers', label: `معرفی کادر و معلمان (${school.teachers.length})`, icon: Users },
-    { id: 'honors', label: `افتخارات و دستاوردها (${school.honors.length})`, icon: Trophy },
+    { id: 'teachers', label: `معرفی کادر و معلمان (${teachersCount})`, icon: Users },
+    { id: 'honors', label: `افتخارات و دستاوردها (${honorsCount})`, icon: Trophy },
   ];
+
+  const gradientClass = school.colorClasses?.gradient || 'from-blue-600 to-indigo-700';
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-navy-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 md:p-6 animate-fadeIn">
@@ -37,7 +57,7 @@ export default function SchoolPanelModal({ school, onClose, onSelectSchool }) {
       <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[92vh] border border-slate-200">
         
         {/* Modal Header */}
-        <div className={`p-6 sm:p-8 bg-gradient-to-r ${school.colorClasses.gradient} text-white relative flex-shrink-0 overflow-hidden`}>
+        <div className={`p-6 sm:p-8 bg-gradient-to-r ${gradientClass} text-white relative flex-shrink-0 overflow-hidden`}>
           {/* Ambient luminous glow */}
           <div className="absolute -top-12 -left-12 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
           
@@ -46,13 +66,13 @@ export default function SchoolPanelModal({ school, onClose, onSelectSchool }) {
             {/* Quick Switcher Between 4 Schools */}
             <div className="flex items-center gap-1.5 overflow-x-auto py-1 scrollbar-none">
               <span className="text-xs text-white/80 ml-2 hidden sm:inline">جابجایی بین مدارس:</span>
-              {schoolsData.map((s) => (
+              {schools.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => {
                     onSelectSchool(s);
                     setActiveTab('overview');
-                                      }}
+                  }}
                   className={`px-3 py-1 rounded-xl text-xs font-bold transition-all ${
                     s.id === school.id
                       ? 'bg-white text-navy-900 shadow-md scale-105'

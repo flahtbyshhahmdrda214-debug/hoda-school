@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { fetchNews } from '../services/newsService';
+import { onDataChanged } from '../services/dataEvents';
 import { Newspaper, Calendar, Clock, ArrowLeft, Search, Tag } from 'lucide-react';
 
 export default function NewsPage() {
@@ -13,9 +14,16 @@ export default function NewsPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchNews()
-      .then((items) => setNews(items))
-      .finally(() => setLoading(false));
+    const load = () => {
+      fetchNews()
+        .then((items) => setNews(items || []))
+        .finally(() => setLoading(false));
+    };
+    load();
+    const unsub = onDataChanged(() => {
+      load();
+    });
+    return unsub;
   }, []);
 
   const categories = ['همه', 'اطلاعیه مهم', 'افتخارات قرآنی', 'توسعه فناوری', 'رویداد و آموزش خانواده'];
