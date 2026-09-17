@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Sparkles } from 'lucide-react';
 
 export default function Hoda3DLogo({ 
   size = 'xl', 
@@ -90,67 +89,15 @@ export default function Hoda3DLogo({
       onClick={handleClick}
       style={{ perspective: '1200px' }}
       className={`relative select-none flex items-center justify-center cursor-pointer group ${sizeClasses[size] || sizeClasses.xl} ${className}`}
-      title="نشان سه‌بعدی شیشه‌ای مجتمع هدی (چرخش خودکار هر ۱۰ ثانیه)"
     >
-      {/* 1. Multi-Layer Pulsing Aurora Glow Behind Glass */}
-      <div 
-        className={`absolute -inset-4 rounded-full bg-gradient-to-tr from-turquoise-500/30 via-amber-400/20 to-emerald-400/30 blur-2xl transition-opacity duration-700 pointer-events-none ${
-          motion ? 'animate-pulse-halo' : ''
-        } ${isHovered || isSpinning ? 'opacity-90' : 'opacity-60'}`}
-      />
-
-      {/* 2. Soft Secondary Ambient Rim Glow */}
-      <div 
-        className="absolute inset-1 rounded-full bg-turquoise-400/20 blur-lg pointer-events-none"
-      />
-
-      {/* 3. Orbiting Sparkle Stars */}
-      {motion && size !== 'xs' && size !== 'sm' && (
-        <div className="absolute inset-0 pointer-events-none animate-orbit-stars">
-          <div className="absolute top-1 right-3 text-amber-300 animate-pulse">
-            <Sparkles className="w-4 h-4 opacity-80" />
-          </div>
-          <div className="absolute bottom-2 left-4 text-turquoise-300 animate-pulse delay-500">
-            <Sparkles className="w-3.5 h-3.5 opacity-80" />
-          </div>
-        </div>
-      )}
-
-      {/* Outer Levitation Floating Wrapper (decoupled from rotation) */}
+      {/* Outer Levitation Floating Wrapper */}
       <div 
         className={`relative w-full h-full flex items-center justify-center ${
           motion && !isHovered && !isSpinning ? 'animate-float-vertical' : ''
         }`}
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* 4. Glassmorphic Crystal Disc Plate (چرخش هماهنگ بستر شیشه‌ای بدون فیلترهای مات‌کننده) */}
-        {size !== 'xs' && (
-          <div 
-            style={{
-              transform: `rotateX(${isHovered ? rotate.x * 0.6 : 0}deg) rotateY(${spinAngle + (isHovered ? rotate.y * 0.6 : 0)}deg) translateZ(0)`,
-              transition: isSpinning
-                ? 'transform 1.8s cubic-bezier(0.34, 1.2, 0.64, 1)'
-                : isHovered
-                ? 'transform 0.12s ease-out'
-                : 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-              transformStyle: 'preserve-3d',
-              backfaceVisibility: 'hidden',
-              WebkitBackfaceVisibility: 'hidden',
-            }}
-            className="absolute inset-1.5 sm:inset-2.5 rounded-full bg-white/20 border-2 border-white/60 shadow-[0_16px_40px_rgba(0,0,0,0.35),inset_0_2px_5px_rgba(255,255,255,0.7),inset_0_-2px_6px_rgba(0,0,0,0.2)] ring-1 ring-white/30 pointer-events-none overflow-hidden transition-colors duration-300 group-hover:border-white/80 group-hover:bg-white/25"
-          >
-            {/* Diagonal Caustic Glass Refraction Highlight */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/45 via-white/5 to-transparent pointer-events-none" />
-            {/* Inner Concentric Glass Bevel Line */}
-            <div className="absolute inset-2 sm:inset-3 rounded-full border border-white/35 pointer-events-none" />
-            {/* Upper Rim Crystalline Glint */}
-            <div className="absolute top-0 inset-x-6 sm:inset-x-8 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent blur-[0.5px]" />
-            {/* Subtle Bottom Ground Shadow */}
-            <div className="absolute bottom-0 inset-x-10 h-3 bg-black/10 blur-sm rounded-full" />
-          </div>
-        )}
-
-        {/* 5. Main 3D Logo Container with 10-Second 360° Revolution & Ultra-Sharp Rendering */}
+        {/* Main 3D Logo Container with 10-Second 360° Revolution & Ultra-Sharp 4K Rendering */}
         <div
           style={{
             transform: `rotateX(${isHovered ? rotate.x : 0}deg) rotateY(${spinAngle + (isHovered ? rotate.y : 0)}deg) translateZ(0)`,
@@ -163,12 +110,12 @@ export default function Hoda3DLogo({
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
           }}
-          className="relative w-full h-full flex items-center justify-center filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.45)]"
+          className="relative w-full h-full flex items-center justify-center filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.4)]"
         >
-          {/* 4K Ultra-Crisp Transparent 3D Logo (100% Razor Sharp on Hover) */}
+          {/* 4K Ultra-Crisp Transparent 3D Logo */}
           <img
             src="/assets/hoda-3d-logo-4k.png"
-            alt="نشان سه‌بعدی شیشه‌ای ۴K مجتمع آموزشی و قرآنی هدی"
+            alt="نشان سه‌بعدی مجتمع آموزشی و قرآنی هدی"
             loading="eager"
             decoding="async"
             style={{
@@ -181,7 +128,7 @@ export default function Hoda3DLogo({
             className="w-full h-full object-contain pointer-events-none select-none"
           />
 
-          {/* 6. Continuous Light Sweep Shimmer Beam across Glass */}
+          {/* Continuous Light Sweep Shimmer Beam across Logo */}
           {motion && (
             <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none mix-blend-overlay">
               <div className={`w-[200%] h-20 bg-gradient-to-r from-transparent via-white/70 to-transparent -translate-x-full ${
@@ -191,14 +138,6 @@ export default function Hoda3DLogo({
           )}
         </div>
       </div>
-
-      {/* 7. Tooltip on Hover */}
-      {isHovered && !isSpinning && size !== 'xs' && size !== 'sm' && (
-        <div className="absolute -bottom-8 px-3.5 py-1 rounded-full bg-slate-950/90 backdrop-blur-md text-white border border-turquoise-400/50 text-[11px] font-bold tracking-tight shadow-2xl whitespace-nowrap z-20 pointer-events-none animate-fadeIn flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span>نشان سه‌بعدی شیشه‌ای هدی • چرخش خودکار هر ۱۰ ثانیه</span>
-        </div>
-      )}
     </div>
   );
 }
