@@ -1,4 +1,4 @@
-﻿/** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
@@ -17,6 +17,7 @@ export default {
           600: '#1e59e6',
           700: '#1843d4',
           800: '#14319a',
+          850: '#0f2b6b',
           900: '#0f245c',
           950: '#081538',
         },

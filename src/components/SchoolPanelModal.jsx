@@ -37,7 +37,9 @@ export default function SchoolPanelModal({ school, onClose, onSelectSchool }) {
       <div className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[92vh] border border-slate-200">
         
         {/* Modal Header */}
-        <div className={`p-6 sm:p-8 bg-gradient-to-r ${school.colorClasses.gradient} text-white relative flex-shrink-0`}>
+        <div className={`p-6 sm:p-8 bg-gradient-to-r ${school.colorClasses.gradient} text-white relative flex-shrink-0 overflow-hidden`}>
+          {/* Ambient luminous glow */}
+          <div className="absolute -top-12 -left-12 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
           
           {/* Top Row: Switch schools & Close button */}
           <div className="flex items-center justify-between gap-2 mb-4">

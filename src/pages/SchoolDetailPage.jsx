@@ -76,7 +76,7 @@ export default function SchoolDetailPage() {
       <Navbar />
 
       {/* Hero Header */}
-      <section className="relative bg-gradient-to-b from-navy-950 via-navy-900 to-navy-850 text-white py-16 sm:py-24 overflow-hidden border-b border-navy-800">
+      <section className={`relative bg-gradient-to-b ${school.slug === 'boys-highschool' ? 'from-[#0b2246] via-[#143e74] to-navy-950' : 'from-navy-950 via-navy-900 to-navy-800'} text-white py-16 sm:py-24 overflow-hidden border-b border-navy-800`}>
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#13B5DE_1px,transparent_1px)] [background-size:20px_20px]"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           

@@ -19,11 +19,11 @@ export default function SchoolsShowcase({ onSelectSchool }) {
       ring: 'group-hover:border-blue-400',
     },
     2: {
-      headerGradient: 'from-navy-950 via-navy-900 to-navy-850',
-      tagBg: 'bg-navy-50 text-navy-900 border-navy-200',
-      btnBg: 'bg-navy-950 hover:bg-navy-900 text-white',
-      accentColor: 'text-navy-900',
-      ring: 'group-hover:border-navy-400',
+      headerGradient: 'from-[#0b2246] via-[#143e74] to-[#1e5eb4]',
+      tagBg: 'bg-blue-50 text-blue-900 border-blue-200',
+      btnBg: 'bg-gradient-to-r from-[#0b2246] to-[#1e5eb4] hover:from-[#143e74] hover:to-[#2563eb] text-white',
+      accentColor: 'text-blue-700',
+      ring: 'group-hover:border-blue-400',
     },
     3: {
       headerGradient: 'from-turquoise-700 to-teal-800',
@@ -33,7 +33,7 @@ export default function SchoolsShowcase({ onSelectSchool }) {
       ring: 'group-hover:border-turquoise-400',
     },
     4: {
-      headerGradient: 'from-navy-950 via-teal-900 to-indigo-900',
+      headerGradient: 'from-[#1e1b4b] via-[#312e81] to-[#4338ca]',
       tagBg: 'bg-indigo-50 text-indigo-900 border-indigo-200',
       btnBg: 'bg-indigo-700 hover:bg-indigo-800 text-white',
       accentColor: 'text-indigo-700',
@@ -74,13 +74,15 @@ export default function SchoolsShowcase({ onSelectSchool }) {
               >
                 <div>
                   {/* Card Header Banner with color gradient matching the palette */}
-                  <div className={`p-6 bg-gradient-to-r ${v.headerGradient} text-white relative`}>
-                    <div className="flex items-center justify-between gap-4">
+                  <div className={`p-6 bg-gradient-to-r ${v.headerGradient} text-white relative overflow-hidden`}>
+                    {/* Subtle ambient light orb */}
+                    <div className="absolute -top-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+                    <div className="flex items-center justify-between gap-4 relative z-10">
                       <div>
                         <span className="text-xs font-bold px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
                           {school.shortName}
                         </span>
-                        <h3 className="text-xl sm:text-2xl font-black mt-2 leading-tight">
+                        <h3 className="text-xl sm:text-2xl font-black mt-2 leading-tight drop-shadow-sm">
                           {school.fullName}
                         </h3>
                       </div>
