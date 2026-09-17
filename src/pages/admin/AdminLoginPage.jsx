@@ -17,7 +17,8 @@ export default function AdminLoginPage() {
 
     try {
       await login(identifier, password);
-      navigate('/admin');
+      // Hard navigation ensures clean mounting and re-reading of localStorage session
+      window.location.href = '/admin';
     } catch (err) {
       setError(err.message || 'نام کاربری یا کلمه عبور نادرست است');
     } finally {
@@ -77,6 +78,21 @@ export default function AdminLoginPage() {
                 />
                 <Lock className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2" />
               </div>
+            </div>
+
+            {/* Quick Fill Credentials Helper */}
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center justify-between text-xs text-slate-300">
+              <div>
+                <span className="text-[11px] text-slate-400 block">حساب پیش‌فرض مدیر:</span>
+                <span className="font-mono text-turquoise-400 font-bold">admin / Admin@Hoda2026!</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setIdentifier('admin'); setPassword('Admin@Hoda2026!'); }}
+                className="text-[11px] bg-turquoise-500/20 hover:bg-turquoise-500/30 text-turquoise-300 px-2.5 py-1 rounded-lg transition-colors font-medium"
+              >
+                درج خودکار
+              </button>
             </div>
 
             <button

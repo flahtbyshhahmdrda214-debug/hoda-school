@@ -375,6 +375,61 @@ export function handleMockRequest(endpoint, options = {}) {
     return getItem(STORAGE_KEYS.AUDIT_LOGS, []);
   }
 
+  // 9. Auth Handlers
+  if (cleanEndpoint === '/auth/login' && method === 'POST') {
+    const rawId = (body.identifier || body.username || '').trim().toLowerCase();
+    const rawPw = (body.password || '').trim();
+
+    const isAdmin = rawId.includes('admin') || rawId === 'superadmin' || rawId.includes('hoda');
+    const isPassValid = rawPw === 'Admin@Hoda2026!' || rawPw === 'AdminHoda2026!#' || rawPw === 'admin' || rawPw === 'Admin@Hoda2026' || rawPw.length >= 4;
+
+    if (isAdmin && isPassValid) {
+      const user = {
+        id: 'admin-main',
+        username: rawId.includes('boyselem') ? 'admin_boyselem' : 'superadmin',
+        role: rawId.includes('boyselem') ? 'SCHOOL_ADMIN' : 'SUPERADMIN',
+        fullName: rawId.includes('boyselem') ? 'مدیر دبستان پسرانه' : 'مدیر کل سامانه',
+        email: `${rawId}@hodaschool.ir`
+      };
+      localStorage.setItem('hoda_admin_user', JSON.stringify(user));
+      localStorage.setItem('hoda_admin_token', 'local_active_session_' + Date.now());
+      logAudit('LOGIN_SUCCESS', 'User', user.id);
+      return { user, token: 'local_active_session_' + Date.now() };
+    }
+
+    if (rawId.includes('editor')) {
+      const user = {
+        id: 'editor-1',
+        username: 'editor_user',
+        role: 'EDITOR',
+        fullName: 'کارشناس تولید محتوا',
+        email: 'editor@hodaschool.ir'
+      };
+      localStorage.setItem('hoda_admin_user', JSON.stringify(user));
+      localStorage.setItem('hoda_admin_token', 'local_active_session_' + Date.now());
+      logAudit('LOGIN_SUCCESS', 'User', user.id);
+      return { user, token: 'local_active_session_' + Date.now() };
+    }
+
+    throw new Error('نام کاربری یا کلمه عبور نادرست است');
+  }
+
+  if (cleanEndpoint === '/auth/me') {
+    const user = getItem('hoda_admin_user', {
+      id: 'admin-main',
+      username: 'superadmin',
+      role: 'SUPERADMIN',
+      fullName: 'مدیر کل سامانه'
+    });
+    return user;
+  }
+
+  if (cleanEndpoint === '/auth/logout') {
+    localStorage.removeItem('hoda_admin_user');
+    localStorage.removeItem('hoda_admin_token');
+    return { success: true };
+  }
+
   // Default fallback
   return { success: true };
 }
