@@ -2,8 +2,8 @@ FROM node:22-slim
 
 WORKDIR /app
 
-# Install openssl for Prisma binary engines
-RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+# Install openssl for Prisma binary engines (with Check-Date=false to prevent clock skew issues)
+RUN apt-get update -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Copy package manifests and Prisma schemas
 COPY package*.json ./
