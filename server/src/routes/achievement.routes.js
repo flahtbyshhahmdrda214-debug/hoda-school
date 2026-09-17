@@ -2,10 +2,9 @@ import { listAchievements, createAchievement, updateAchievement, deleteAchieveme
 import { authenticate, authorize } from '../middleware/auth.js';
 
 export default async function achievementRoutes(fastify, options) {
-  fastify.addHook('preHandler', authenticate);
-
   fastify.get('/', listAchievements);
-  fastify.post('/', { preHandler: [authorize(['SUPERADMIN', 'SCHOOL_ADMIN'])] }, createAchievement);
-  fastify.put('/:id', { preHandler: [authorize(['SUPERADMIN', 'SCHOOL_ADMIN'])] }, updateAchievement);
-  fastify.delete('/:id', { preHandler: [authorize(['SUPERADMIN', 'SCHOOL_ADMIN'])] }, deleteAchievement);
+  fastify.post('/', { preHandler: [authenticate, authorize(['SUPERADMIN', 'SCHOOL_ADMIN'])] }, createAchievement);
+  fastify.put('/:id', { preHandler: [authenticate, authorize(['SUPERADMIN', 'SCHOOL_ADMIN'])] }, updateAchievement);
+  fastify.delete('/:id', { preHandler: [authenticate, authorize(['SUPERADMIN', 'SCHOOL_ADMIN'])] }, deleteAchievement);
 }
+

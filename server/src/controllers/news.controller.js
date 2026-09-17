@@ -90,13 +90,14 @@ export async function getNewsById(request, reply) {
 }
 
 export async function createNews(request, reply) {
-  const { title, summary, contentHtml, coverImageUrl, category, schoolId, isFeatured, isPublished } = request.body;
+  const { title, summary, coverImageUrl, category, schoolId, isFeatured, isPublished } = request.body;
+  const rawContent = request.body.contentHtml || request.body.content;
 
-  if (!title || !summary || !contentHtml || !category) {
+  if (!title || !summary || !rawContent || !category) {
     return errorResponse(reply, 'عنوان، خلاصه، متن خبر و دسته‌بندی الزامی هستند', 'VALIDATION_ERROR', 400);
   }
 
-  const cleanContentHtml = sanitizeHtml(contentHtml, SANITIZE_OPTIONS);
+  const cleanContentHtml = sanitizeHtml(rawContent, SANITIZE_OPTIONS);
   const slug = generateSlug(title);
 
   const news = await prisma.news.create({
@@ -123,7 +124,8 @@ export async function createNews(request, reply) {
     ipAddress: request.ip
   });
 
-  return successResponse(reply, news, 'خبر با موفقیت ایجاد شد', 201);
+  const responseData = { ...news, content: news.contentHtml };
+  return successResponse(reply, responseData, 'خبر با موفقیت ایجاد شد', 201);
 }
 
 export async function updateNews(request, reply) {
@@ -134,12 +136,13 @@ export async function updateNews(request, reply) {
     return errorResponse(reply, 'خبر مورد نظر یافت نشد', 'NOT_FOUND', 404);
   }
 
-  const { title, summary, contentHtml, coverImageUrl, category, schoolId, isFeatured, isPublished } = request.body;
+  const { title, summary, coverImageUrl, category, schoolId, isFeatured, isPublished } = request.body;
+  const rawContent = request.body.contentHtml !== undefined ? request.body.contentHtml : request.body.content;
 
   const data = {};
   if (title !== undefined) data.title = title;
   if (summary !== undefined) data.summary = summary;
-  if (contentHtml !== undefined) data.contentHtml = sanitizeHtml(contentHtml, SANITIZE_OPTIONS);
+  if (rawContent !== undefined) data.contentHtml = sanitizeHtml(rawContent, SANITIZE_OPTIONS);
   if (coverImageUrl !== undefined) data.coverImageUrl = coverImageUrl;
   if (category !== undefined) data.category = category;
   if (schoolId !== undefined) data.schoolId = schoolId || null;
@@ -160,7 +163,8 @@ export async function updateNews(request, reply) {
     ipAddress: request.ip
   });
 
-  return successResponse(reply, updated, 'خبر با موفقیت به‌روزرسانی شد');
+  const responseData = { ...updated, content: updated.contentHtml };
+  return successResponse(reply, responseData, 'خبر با موفقیت به‌روزرسانی شد');
 }
 
 export async function deleteNews(request, reply) {

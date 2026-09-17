@@ -26,7 +26,10 @@ export async function listTeachers(request, reply) {
 }
 
 export async function createTeacher(request, reply) {
-  const { firstName, lastName, roleTitle, degree, experience, highlight, avatarUrl, sortOrder, isPublished } = request.body;
+  const { firstName, lastName, highlight, avatarUrl, sortOrder, isPublished } = request.body;
+  const roleTitle = request.body.roleTitle || request.body.role;
+  const degree = request.body.degree || request.body.educationDegree;
+  const experience = request.body.experience || request.body.teachingExperience;
   let { schoolId } = request.body;
 
   if (request.user.role === 'SCHOOL_ADMIN') {
@@ -76,9 +79,17 @@ export async function updateTeacher(request, reply) {
     return errorResponse(reply, 'شما مجاز به ویرایش این معلم نیستید', 'FORBIDDEN', 403);
   }
 
+  const updateData = { ...request.body };
+  if (updateData.role && !updateData.roleTitle) updateData.roleTitle = updateData.role;
+  delete updateData.role;
+  if (updateData.educationDegree && !updateData.degree) updateData.degree = updateData.educationDegree;
+  delete updateData.educationDegree;
+  if (updateData.teachingExperience && !updateData.experience) updateData.experience = updateData.teachingExperience;
+  delete updateData.teachingExperience;
+
   const updated = await prisma.teacher.update({
     where: { id },
-    data: request.body
+    data: updateData
   });
 
   await createAuditLog({

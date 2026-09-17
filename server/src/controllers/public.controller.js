@@ -173,3 +173,41 @@ export async function getPublicSettings(request, reply) {
   }
   return successResponse(reply, formatted);
 }
+
+export async function getPublicAchievements(request, reply) {
+  const { schoolSlug, category } = request.query;
+  const where = { isPublished: true };
+  if (category) where.category = category;
+  if (schoolSlug) where.school = { slug: schoolSlug };
+
+  const achievements = await prisma.achievement.findMany({
+    where,
+    orderBy: { sortOrder: 'asc' },
+    include: {
+      school: {
+        select: { id: true, shortName: true, slug: true, themeColor: true }
+      }
+    }
+  });
+
+  return successResponse(reply, achievements);
+}
+
+export async function getPublicGallery(request, reply) {
+  const { schoolSlug, category } = request.query;
+  const where = {};
+  if (category) where.category = category;
+  if (schoolSlug) where.school = { slug: schoolSlug };
+
+  const gallery = await prisma.gallery.findMany({
+    where,
+    orderBy: { sortOrder: 'asc' },
+    include: {
+      school: {
+        select: { id: true, shortName: true, slug: true, themeColor: true }
+      }
+    }
+  });
+
+  return successResponse(reply, gallery);
+}

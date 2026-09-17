@@ -10,10 +10,11 @@ export async function listDocuments(request, reply) {
 }
 
 export async function createDocument(request, reply) {
-  const { title, description, previewImageUrl, fileUrl, issuer, documentNumber, issueDate, iconName, sortOrder, isPublished } = request.body;
+  const { title, description, previewImageUrl, fileUrl, documentNumber, issueDate, iconName, sortOrder, isPublished } = request.body;
+  const issuer = request.body.issuer || 'مجتمع آموزشی قرآنی هدی';
 
-  if (!title || !fileUrl || !issuer) {
-    return errorResponse(reply, 'عنوان، فایل سند و مرجع صادرکننده الزامی هستند', 'VALIDATION_ERROR', 400);
+  if (!title || !fileUrl) {
+    return errorResponse(reply, 'عنوان و فایل سند الزامی هستند', 'VALIDATION_ERROR', 400);
   }
 
   const doc = await prisma.document.create({

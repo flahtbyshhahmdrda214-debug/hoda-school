@@ -5,12 +5,11 @@ export async function authenticate(request, reply) {
   try {
     let token = null;
 
-    // Check signed cookie first
-    if (request.cookies && request.cookies.hoda_auth_token) {
-      const unsigned = request.unsignCookie(request.cookies.hoda_auth_token);
-      if (unsigned.valid) {
-        token = unsigned.value;
-      }
+    // Check signed cookies first
+    const rawCookie = request.cookies?.hoda_auth_token || request.cookies?.access_token;
+    if (rawCookie) {
+      const unsigned = request.unsignCookie(rawCookie);
+      token = unsigned.valid ? unsigned.value : rawCookie;
     }
 
     // Fallback to Bearer authorization header

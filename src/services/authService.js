@@ -6,9 +6,7 @@ export async function login(identifier, password) {
     body: { identifier, password },
   });
 
-  if (result.token) {
-    localStorage.setItem('hoda_admin_token', result.token);
-  }
+  // Security: JWT token is transported securely via HttpOnly cookies and NOT stored in localStorage
   if (result.user) {
     localStorage.setItem('hoda_admin_user', JSON.stringify(result.user));
   }
@@ -40,5 +38,5 @@ export function getCurrentUser() {
 }
 
 export function isAuthenticated() {
-  return !!localStorage.getItem('hoda_admin_token');
+  return !!localStorage.getItem('hoda_admin_user');
 }

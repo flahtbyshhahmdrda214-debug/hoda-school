@@ -4,6 +4,8 @@ import {
   getPublicNews,
   getPublicNewsBySlug,
   getPublicDocuments,
+  getPublicAchievements,
+  getPublicGallery,
   getPublicSettings
 } from '../controllers/public.controller.js';
 
@@ -14,5 +16,7 @@ export default async function publicRoutes(fastify, options) {
   fastify.get('/news', getPublicNews);
   fastify.get('/news/:slug', getPublicNewsBySlug);
   fastify.get('/documents', getPublicDocuments);
+  fastify.get('/achievements', getPublicAchievements);
+  fastify.get('/gallery', getPublicGallery);
   fastify.get('/settings', getPublicSettings);
 }

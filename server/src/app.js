@@ -23,6 +23,7 @@ import documentRoutes from './routes/document.routes.js';
 import settingRoutes from './routes/setting.routes.js';
 import userRoutes from './routes/user.routes.js';
 import publicRoutes from './routes/public.routes.js';
+import galleryRoutes from './routes/gallery.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -105,6 +106,7 @@ export async function buildApp() {
   await app.register(documentRoutes, { prefix: '/api/v1/documents' });
   await app.register(settingRoutes, { prefix: '/api/v1/settings' });
   await app.register(userRoutes, { prefix: '/api/v1/users' });
+  await app.register(galleryRoutes, { prefix: '/api/v1/gallery' });
   await app.register(publicRoutes, { prefix: '/api/v1/public' });
 
   // 9. Health Check Route

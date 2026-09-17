@@ -40,5 +40,35 @@ export async function updateSetting(request, reply) {
     ipAddress: request.ip
   });
 
-  return successResponse(reply, { key: updated.key, value: JSON.parse(updated.value) }, 'تنظیمات با موفقیت ذخیره شد');
+  let parsedVal = updated.value;
+  try { parsedVal = JSON.parse(updated.value); } catch {}
+
+  return successResponse(reply, { key: updated.key, value: parsedVal }, 'تنظیمات با موفقیت ذخیره شد');
+}
+
+export async function updateSettingsBatch(request, reply) {
+  const updates = request.body;
+  if (!updates || typeof updates !== 'object') {
+    return errorResponse(reply, 'اطلاعات نامعتبر است', 'VALIDATION_ERROR', 400);
+  }
+
+  for (const [key, value] of Object.entries(updates)) {
+    const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    await prisma.siteSetting.upsert({
+      where: { key },
+      update: { value: stringValue },
+      create: { key, value: stringValue }
+    });
+  }
+
+  await createAuditLog({
+    userId: request.user.id,
+    action: 'UPDATE_SETTINGS_BATCH',
+    entity: 'SiteSetting',
+    entityId: 'all',
+    newValues: updates,
+    ipAddress: request.ip
+  });
+
+  return successResponse(reply, updates, 'تنظیمات با موفقیت ذخیره شدند');
 }

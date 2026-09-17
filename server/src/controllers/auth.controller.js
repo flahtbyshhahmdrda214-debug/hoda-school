@@ -52,15 +52,18 @@ export async function login(request, reply) {
     expiresIn: config.jwt.expiresIn
   });
 
-  // Set HTTP-only secure signed cookie
-  reply.setCookie('hoda_auth_token', token, {
+  // Set HTTP-only secure signed cookies
+  const cookieOptions = {
     path: '/',
     httpOnly: true,
     secure: config.isProd,
     sameSite: 'lax',
     signed: true,
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-  });
+  };
+
+  reply.setCookie('hoda_auth_token', token, cookieOptions);
+  reply.setCookie('access_token', token, cookieOptions);
 
   // Update last login
   await prisma.user.update({
@@ -103,6 +106,11 @@ export async function logout(request, reply) {
   }
 
   reply.clearCookie('hoda_auth_token', {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+  });
+  reply.clearCookie('access_token', {
     path: '/',
     httpOnly: true,
     sameSite: 'lax',

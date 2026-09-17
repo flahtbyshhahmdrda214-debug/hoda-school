@@ -26,13 +26,9 @@ export default function AdminMedia() {
     formData.append('folder', 'general');
 
     try {
-      await fetch('http://localhost:4000/api/v1/media/upload', {
+      await apiRequest('/media/upload', {
         method: 'POST',
-        body: formData,
-        credentials: 'include',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('hoda_admin_token')}`
-        }
+        body: formData
       });
       loadMedia();
     } catch (err) {
