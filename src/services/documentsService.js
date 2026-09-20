@@ -12,3 +12,15 @@ export async function fetchDocuments() {
   }
   return getLiveDocuments();
 }
+
+export async function createDocument(payload) {
+  return apiRequest('/documents', { method: 'POST', body: payload });
+}
+
+export async function updateDocument(id, payload) {
+  return apiRequest(`/documents/${id}`, { method: 'PUT', body: payload });
+}
+
+export async function deleteDocument(id) {
+  return apiRequest(`/documents/${id}`, { method: 'DELETE' });
+}

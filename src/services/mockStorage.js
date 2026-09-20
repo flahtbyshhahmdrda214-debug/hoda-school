@@ -745,7 +745,8 @@ export function handleMockRequest(endpoint, options = {}) {
         issuer: body.issuer || 'مجتمع آموزشی قرآنی هدی',
         date: body.date || new Date().toLocaleDateString('fa-IR'),
         type: body.type || 'تاییدیه رسمی',
-        fileUrl: body.fileUrl || '/uploads/doc.pdf',
+        fileUrl: body.fileUrl || body.imageUrl || '/uploads/doc.pdf',
+        imageUrl: body.imageUrl || body.coverImageUrl || '',
         icon: body.iconName || body.icon || 'ShieldCheck',
         badgeColor: body.badgeColor || 'blue',
         isPublished: true,
@@ -765,6 +766,29 @@ export function handleMockRequest(endpoint, options = {}) {
       setItem(STORAGE_KEYS.DOCUMENTS, filtered);
       logAudit('DELETE_DOCUMENT', 'Document', id);
       return { success: true };
+    }
+    if (method === 'PUT') {
+      const idx = docs.findIndex(d => String(d.id) === id || String(d.code) === id);
+      if (idx !== -1) {
+        docs[idx] = {
+          ...docs[idx],
+          ...body,
+          documentNumber: body.documentNumber || body.code || docs[idx].documentNumber,
+          code: body.code || body.documentNumber || docs[idx].code,
+          imageUrl: body.imageUrl !== undefined ? body.imageUrl : docs[idx].imageUrl,
+          fileUrl: body.imageUrl || body.fileUrl || docs[idx].fileUrl,
+          updatedAt: new Date().toISOString()
+        };
+        setItem(STORAGE_KEYS.DOCUMENTS, docs);
+        logAudit('UPDATE_DOCUMENT', 'Document', id);
+        return docs[idx];
+      }
+      return body;
+    }
+    if (method === 'GET') {
+      const doc = docs.find(d => String(d.id) === id || String(d.code) === id);
+      if (doc) return doc;
+      throw new Error('سند مورد نظر یافت نشد');
     }
   }
 

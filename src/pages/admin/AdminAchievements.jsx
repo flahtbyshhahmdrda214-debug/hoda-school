@@ -19,6 +19,7 @@ import {
   GraduationCap, 
   BookOpen 
 } from 'lucide-react';
+import ImageUploadField from '../../components/ImageUploadField';
 
 export default function AdminAchievements() {
   const [achievements, setAchievements] = useState([]);
@@ -41,6 +42,7 @@ export default function AdminAchievements() {
     year: '۱۴۰۳',
     category: 'قرآنی',
     description: '',
+    imageUrl: '',
     sortOrder: 1,
     isPublished: true,
   };
@@ -84,6 +86,7 @@ export default function AdminAchievements() {
     setEditingItem({
       ...item,
       schoolId: String(item.schoolId || (item.school?.id || '1')),
+      imageUrl: item.imageUrl || '',
     });
   };
 
@@ -289,6 +292,7 @@ export default function AdminAchievements() {
             <table className="w-full text-right text-xs">
               <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
                 <tr>
+                  <th className="p-4">تصویر</th>
                   <th className="p-4">سال</th>
                   <th className="p-4">عنوان افتخار</th>
                   <th className="p-4">دریافت‌کننده</th>
@@ -301,6 +305,19 @@ export default function AdminAchievements() {
               <tbody className="divide-y divide-slate-100">
                 {filteredList.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="p-4 whitespace-nowrap">
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-2xs"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                          <Trophy className="w-4 h-4 text-slate-300" />
+                        </div>
+                      )}
+                    </td>
                     <td className="p-4 font-mono font-bold text-slate-700 whitespace-nowrap">
                       {item.year}
                     </td>
@@ -457,6 +474,14 @@ export default function AdminAchievements() {
                 </div>
               </div>
 
+              {/* Image Upload for Achievement */}
+              <ImageUploadField
+                label="تصویر افتخار، مدال یا تقدیرنامه"
+                value={form.imageUrl}
+                onChange={(url) => setForm({ ...form, imageUrl: url })}
+                helperText="آپلود تصویر لوح تقدیر، مدال یا عکس فرد برگزیده"
+              />
+
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">توضیحات و جزئیات تکمیلی</label>
                 <textarea
@@ -578,6 +603,14 @@ export default function AdminAchievements() {
                   </select>
                 </div>
               </div>
+
+              {/* Image Upload for Achievement Edit */}
+              <ImageUploadField
+                label="تصویر افتخار، مدال یا تقدیرنامه"
+                value={editingItem.imageUrl || ''}
+                onChange={(url) => setEditingItem({ ...editingItem, imageUrl: url })}
+                helperText="امکان تغییر یا حذف تصویر قبلی افتخار"
+              />
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">توضیحات و جزئیات تکمیلی</label>

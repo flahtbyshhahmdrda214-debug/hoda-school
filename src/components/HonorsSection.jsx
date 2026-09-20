@@ -216,6 +216,17 @@ export default function HonorsSection() {
                       </span>
                     </div>
 
+                    {/* Optional Image Banner */}
+                    {honor.imageUrl && (
+                      <div className="relative h-36 w-full rounded-2xl overflow-hidden mb-4 bg-slate-100 border border-slate-100">
+                        <img
+                          src={honor.imageUrl}
+                          alt={honor.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+
                     {/* Honor Title with Gold/Accent Icon */}
                     <div className="flex items-start gap-3.5 mb-3">
                       <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ${style.bg} group-hover:scale-110 transition-transform`}>
@@ -306,6 +317,17 @@ export default function HonorsSection() {
             <h3 className="text-lg sm:text-xl font-black text-navy-950 leading-relaxed mb-4">
               {activeModalHonor.title}
             </h3>
+
+            {/* Optional Image in Modal */}
+            {activeModalHonor.imageUrl && (
+              <div className="relative h-48 sm:h-56 w-full rounded-2xl overflow-hidden mb-4 bg-slate-100 border border-slate-200">
+                <img
+                  src={activeModalHonor.imageUrl}
+                  alt={activeModalHonor.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
 
             {/* Recipient */}
             {activeModalHonor.recipient && (

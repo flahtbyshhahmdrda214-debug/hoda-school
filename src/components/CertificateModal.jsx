@@ -67,6 +67,17 @@ export default function CertificateModal({ item, onClose }) {
             </div>
           </div>
 
+          {/* Optional Document Image */}
+          {(item.imageUrl || (item.fileUrl && !item.fileUrl.endsWith('.pdf'))) && (
+            <div className="mb-6 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-inner">
+              <img
+                src={item.imageUrl || item.fileUrl}
+                alt={item.title}
+                className="w-full max-h-80 object-contain mx-auto"
+              />
+            </div>
+          )}
+
           {/* Description */}
           <div className="mb-6">
             <h4 className="text-sm font-bold text-navy-900 mb-2">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiRequest } from '../../services/apiClient';
-import { Plus, Trash2, Edit, Check, X } from 'lucide-react';
+import { Plus, Trash2, Edit, Check, X, Newspaper } from 'lucide-react';
+import ImageUploadField from '../../components/ImageUploadField';
 
 export default function AdminNews() {
   const [news, setNews] = useState([]);
@@ -86,6 +87,7 @@ export default function AdminNews() {
         <table className="w-full text-right text-xs">
           <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
             <tr>
+              <th className="p-4">تصویر</th>
               <th className="p-4">عنوان خبر</th>
               <th className="p-4">دسته‌بندی</th>
               <th className="p-4">وضعیت</th>
@@ -96,6 +98,22 @@ export default function AdminNews() {
           <tbody className="divide-y divide-slate-100">
             {news.map((item) => (
               <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                <td className="p-4 whitespace-nowrap">
+                  {item.coverImageUrl || item.thumbnail ? (
+                    <img
+                      src={item.coverImageUrl || item.thumbnail}
+                      alt={item.title}
+                      className="w-12 h-10 rounded-xl object-cover border border-slate-200 shadow-2xs"
+                      onError={(e) => {
+                        e.currentTarget.src = '/assets/campus-1.webp';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-12 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                      <Newspaper className="w-4 h-4 text-slate-300" />
+                    </div>
+                  )}
+                </td>
                 <td className="p-4 font-bold text-navy-950 max-w-xs truncate">{item.title}</td>
                 <td className="p-4">
                   <span className="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg font-medium text-[11px]">
@@ -161,31 +179,27 @@ export default function AdminNews() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">دسته‌بندی</label>
-                  <select
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-turquoise-500"
-                  >
-                    <option value="اطلاعیه مهم">اطلاعیه مهم</option>
-                    <option value="افتخارات قرآنی">افتخارات قرآنی</option>
-                    <option value="توسعه فناوری">توسعه فناوری</option>
-                    <option value="رویداد و آموزش خانواده">رویداد و آموزش خانواده</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">لینک تصویر کاور</label>
-                  <input
-                    type="text"
-                    value={form.coverImageUrl}
-                    onChange={(e) => setForm({ ...form, coverImageUrl: e.target.value })}
-                    placeholder="/assets/campus-1.webp یا آدرس اینترنتی"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-turquoise-500 font-mono"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">دسته‌بندی</label>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-turquoise-500"
+                >
+                  <option value="اطلاعیه مهم">اطلاعیه مهم</option>
+                  <option value="افتخارات قرآنی">افتخارات قرآنی</option>
+                  <option value="توسعه فناوری">توسعه فناوری</option>
+                  <option value="رویداد و آموزش خانواده">رویداد و آموزش خانواده</option>
+                </select>
               </div>
+
+              {/* Image Upload for News */}
+              <ImageUploadField
+                label="تصویر شاخص و کاور خبر"
+                value={form.coverImageUrl}
+                onChange={(url) => setForm({ ...form, coverImageUrl: url })}
+                helperText="انتخاب تصویر از سیستم یا درج آدرس اینترنتی (بهینه‌سازی خودکار WebP)"
+              />
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">خلاصه کوتاه خبر (نمایش در کارت‌ها)</label>
@@ -271,31 +285,27 @@ export default function AdminNews() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">دسته‌بندی</label>
-                  <select
-                    value={editingNews.category || 'اطلاعیه مهم'}
-                    onChange={(e) => setEditingNews({ ...editingNews, category: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-turquoise-500"
-                  >
-                    <option value="اطلاعیه مهم">اطلاعیه مهم</option>
-                    <option value="افتخارات قرآنی">افتخارات قرآنی</option>
-                    <option value="توسعه فناوری">توسعه فناوری</option>
-                    <option value="رویداد و آموزش خانواده">رویداد و آموزش خانواده</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">لینک تصویر کاور</label>
-                  <input
-                    type="text"
-                    value={editingNews.coverImageUrl || ''}
-                    onChange={(e) => setEditingNews({ ...editingNews, coverImageUrl: e.target.value })}
-                    placeholder="/assets/campus-1.webp یا آدرس اینترنتی"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-turquoise-500 font-mono"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">دسته‌بندی</label>
+                <select
+                  value={editingNews.category || 'اطلاعیه مهم'}
+                  onChange={(e) => setEditingNews({ ...editingNews, category: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-turquoise-500"
+                >
+                  <option value="اطلاعیه مهم">اطلاعیه مهم</option>
+                  <option value="افتخارات قرآنی">افتخارات قرآنی</option>
+                  <option value="توسعه فناوری">توسعه فناوری</option>
+                  <option value="رویداد و آموزش خانواده">رویداد و آموزش خانواده</option>
+                </select>
               </div>
+
+              {/* Image Upload for News Edit */}
+              <ImageUploadField
+                label="تصویر شاخص و کاور خبر"
+                value={editingNews.coverImageUrl || ''}
+                onChange={(url) => setEditingNews({ ...editingNews, coverImageUrl: url })}
+                helperText="امکان تغییر، بارگذاری تصویر جدید یا حذف تصویر قبلی خبر"
+              />
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">خلاصه کوتاه خبر</label>

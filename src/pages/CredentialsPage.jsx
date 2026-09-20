@@ -71,6 +71,17 @@ export default function CredentialsPage() {
                   className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 hover:shadow-xl hover:border-turquoise-400 transition-all cursor-pointer flex flex-col justify-between group"
                 >
                   <div className="space-y-4">
+                    {/* Optional Document Image */}
+                    {(doc.imageUrl || (doc.fileUrl && !doc.fileUrl.endsWith('.pdf'))) && (
+                      <div className="relative h-44 w-full rounded-2xl overflow-hidden mb-2 bg-slate-100 border border-slate-100">
+                        <img
+                          src={doc.imageUrl || doc.fileUrl}
+                          alt={doc.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between">
                       <div className="p-3 bg-navy-50 text-navy-900 rounded-2xl group-hover:bg-turquoise-50 group-hover:text-turquoise-700 transition-colors">
                         <Icon className="w-6 h-6" />
