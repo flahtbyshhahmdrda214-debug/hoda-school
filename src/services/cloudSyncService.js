@@ -1,9 +1,3 @@
-// Cloud Sync Service for Hoda Educational Complex
-// Automatically and simultaneously synchronizes data across all devices (PC, Phone, Tablet)
-// without requiring manual QR codes or links.
-
-import { STORAGE_KEYS } from './mockStorage';
-
 export const CLOUD_BINS = {
   meta: 'dbafcce',
   schools: 'accffec',
@@ -17,25 +11,25 @@ export const CLOUD_BINS = {
 };
 
 const KEY_TO_BIN = {
-  [STORAGE_KEYS.SCHOOLS]: 'schools',
-  [STORAGE_KEYS.NEWS]: 'news',
-  [STORAGE_KEYS.ACHIEVEMENTS]: 'achievements',
-  [STORAGE_KEYS.DOCUMENTS]: 'documents',
-  [STORAGE_KEYS.MEMBERS]: 'members',
-  [STORAGE_KEYS.SETTINGS]: 'settings',
-  [STORAGE_KEYS.TEACHERS]: 'teachers',
-  [STORAGE_KEYS.FACILITIES]: 'facilities',
+  'hoda_schools_db': 'schools',
+  'hoda_news_db': 'news',
+  'hoda_achievements_db': 'achievements',
+  'hoda_documents_db': 'documents',
+  'hoda_members_db': 'members',
+  'hoda_settings_db': 'settings',
+  'hoda_teachers_db': 'teachers',
+  'hoda_facilities_db': 'facilities',
 };
 
 const BIN_TO_KEY = {
-  schools: STORAGE_KEYS.SCHOOLS,
-  news: STORAGE_KEYS.NEWS,
-  achievements: STORAGE_KEYS.ACHIEVEMENTS,
-  documents: STORAGE_KEYS.DOCUMENTS,
-  members: STORAGE_KEYS.MEMBERS,
-  settings: STORAGE_KEYS.SETTINGS,
-  teachers: STORAGE_KEYS.TEACHERS,
-  facilities: STORAGE_KEYS.FACILITIES,
+  schools: 'hoda_schools_db',
+  news: 'hoda_news_db',
+  achievements: 'hoda_achievements_db',
+  documents: 'hoda_documents_db',
+  members: 'hoda_members_db',
+  settings: 'hoda_settings_db',
+  teachers: 'hoda_teachers_db',
+  facilities: 'hoda_facilities_db',
 };
 
 const BASE_API = 'https://extendsclass.com/api/json-storage/bin';
