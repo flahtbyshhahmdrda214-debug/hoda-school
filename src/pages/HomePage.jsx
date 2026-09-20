@@ -3,7 +3,6 @@ import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import CredentialsTicker from '../components/CredentialsTicker';
 import NewsSection from '../components/NewsSection';
-import SchoolsShowcase from '../components/SchoolsShowcase';
 import HonorsSection from '../components/HonorsSection';
 import IdentitySection from '../components/IdentitySection';
 import Footer from '../components/Footer';
@@ -57,9 +56,6 @@ export default function HomePage() {
       />
 
       <CredentialsTicker onSelectCredential={setSelectedCredential} />
-
-      {/* 4 Schools Compact Icons Bar */}
-      <SchoolsShowcase onSelectSchool={setSelectedSchool} />
 
       {/* Hall of Fame / Honors & Achievements */}
       <HonorsSection />

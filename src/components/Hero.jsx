@@ -104,7 +104,7 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
         </div>
 
         {/* 4 Borderless Floating 3D School Portals */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 max-w-5xl mx-auto my-1 sm:my-2">
+        <div id="schools" className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 lg:gap-8 max-w-5xl mx-auto my-1 sm:my-2 scroll-mt-24">
           {schools.map((school) => {
             const style = schoolStyles[school.id] || schoolStyles[1];
             return (
