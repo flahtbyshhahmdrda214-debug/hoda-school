@@ -5,7 +5,6 @@ import {
   updateAchievement, 
   deleteAchievement 
 } from '../../services/achievementsService';
-import { apiRequest } from '../../services/apiClient';
 import { 
   Trophy, 
   Plus, 
@@ -14,20 +13,20 @@ import {
   Check, 
   X, 
   Search, 
-  Filter, 
-  Award, 
-  GraduationCap, 
-  BookOpen 
+  Calendar,
+  User,
+  Image as ImageIcon,
+  CheckCircle2,
+  AlertCircle,
+  Building2
 } from 'lucide-react';
 import ImageUploadField from '../../components/ImageUploadField';
 
 export default function AdminAchievements() {
   const [achievements, setAchievements] = useState([]);
-  const [schools, setSchools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterSchool, setFilterSchool] = useState('all');
-  const [filterCategory, setFilterCategory] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'published' | 'draft'
 
   // Modal states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -38,31 +37,18 @@ export default function AdminAchievements() {
   const initialForm = {
     title: '',
     recipient: '',
-    schoolId: '',
     year: '۱۴۰۳',
-    category: 'قرآنی',
     description: '',
     imageUrl: '',
-    sortOrder: 1,
     isPublished: true,
   };
   const [form, setForm] = useState(initialForm);
 
-  const categories = ['قرآنی', 'کنکور سراسری', 'علمی و المپیاد', 'فرهنگی و ورزشی'];
-
   const loadData = async () => {
     setLoading(true);
     try {
-      const [achsRes, schoolsRes] = await Promise.all([
-        fetchAdminAchievements(),
-        apiRequest('/schools'),
-      ]);
+      const achsRes = await fetchAdminAchievements();
       setAchievements(Array.isArray(achsRes) ? achsRes : []);
-      const schoolsList = Array.isArray(schoolsRes) ? schoolsRes : [];
-      setSchools(schoolsList);
-      if (schoolsList.length > 0 && !form.schoolId) {
-        setForm(prev => ({ ...prev, schoolId: String(schoolsList[0].id) }));
-      }
     } catch (err) {
       console.error('Error loading achievements:', err);
     } finally {
@@ -75,18 +61,15 @@ export default function AdminAchievements() {
   }, []);
 
   const handleOpenAdd = () => {
-    setForm({
-      ...initialForm,
-      schoolId: schools.length > 0 ? String(schools[0].id) : '1',
-    });
+    setForm(initialForm);
     setIsAddModalOpen(true);
   };
 
   const handleOpenEdit = (item) => {
     setEditingItem({
       ...item,
-      schoolId: String(item.schoolId || (item.school?.id || '1')),
       imageUrl: item.imageUrl || '',
+      isPublished: item.isPublished !== false,
     });
   };
 
@@ -94,11 +77,9 @@ export default function AdminAchievements() {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const selectedSchool = schools.find(s => String(s.id) === String(form.schoolId));
       const payload = {
         ...form,
-        schoolSlug: selectedSchool?.slug || '',
-        schoolName: selectedSchool?.shortName || '',
+        institution: 'مجتمع آموزشی هدی',
       };
       await createAchievement(payload);
       setIsAddModalOpen(false);
@@ -116,11 +97,9 @@ export default function AdminAchievements() {
     if (!editingItem) return;
     setSubmitting(true);
     try {
-      const selectedSchool = schools.find(s => String(s.id) === String(editingItem.schoolId));
       const payload = {
         ...editingItem,
-        schoolSlug: selectedSchool?.slug || editingItem.schoolSlug,
-        schoolName: selectedSchool?.shortName || editingItem.schoolName,
+        institution: 'مجتمع آموزشی هدی',
       };
       await updateAchievement(editingItem.id, payload);
       setEditingItem(null);
@@ -147,7 +126,7 @@ export default function AdminAchievements() {
       await updateAchievement(item.id, { isPublished: !item.isPublished });
       await loadData();
     } catch (err) {
-      alert(err.message || 'خطا در تغییر وضعیت');
+      alert(err.message || 'خطا در تغییر وضعیت انتشار');
     }
   };
 
@@ -158,23 +137,19 @@ export default function AdminAchievements() {
       const matchTitle = item.title?.toLowerCase().includes(q);
       const matchRecipient = item.recipient?.toLowerCase().includes(q);
       const matchDesc = item.description?.toLowerCase().includes(q);
-      if (!matchTitle && !matchRecipient && !matchDesc) return false;
+      const matchYear = item.year?.toString().includes(q);
+      if (!matchTitle && !matchRecipient && !matchDesc && !matchYear) return false;
     }
-    if (filterSchool !== 'all') {
-      const matchSchool = String(item.schoolId) === filterSchool || item.schoolSlug === filterSchool || item.school?.slug === filterSchool;
-      if (!matchSchool) return false;
-    }
-    if (filterCategory !== 'all') {
-      if (item.category !== filterCategory) return false;
-    }
+    if (statusFilter === 'published' && item.isPublished === false) return false;
+    if (statusFilter === 'draft' && item.isPublished !== false) return false;
     return true;
   });
 
   // Calculate metrics
   const totalCount = achievements.length;
-  const quranCount = achievements.filter(a => a.category?.includes('قرآن')).length;
-  const konkurCount = achievements.filter(a => a.category?.includes('کنکور')).length;
-  const olympiadCount = achievements.filter(a => a.category?.includes('علمی') || a.category?.includes('المپیاد')).length;
+  const publishedCount = achievements.filter(a => a.isPublished !== false).length;
+  const draftCount = achievements.filter(a => a.isPublished === false).length;
+  const withImageCount = achievements.filter(a => !!a.imageUrl).length;
 
   return (
     <div className="space-y-8">
@@ -183,10 +158,10 @@ export default function AdminAchievements() {
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-navy-950 flex items-center gap-2.5">
             <Trophy className="w-6 h-6 text-amber-500" />
-            <span>مدیریت تالار افتخارات و دستاوردها</span>
+            <span>مدیریت تالار افتخارات مجتمع هدی</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            ثبت، ویرایش و انتشار کارنامه درخشان و رتبه‌های نخبگان مجتمع هدی در صفحه اصلی
+            ثبت، ویرایش و مدیریت دستاوردها، تندیس‌ها و افتخارات موسسه در وب‌سایت
           </p>
         </div>
 
@@ -207,145 +182,148 @@ export default function AdminAchievements() {
           </div>
           <div>
             <div className="text-2xl font-black text-navy-950 font-mono">{totalCount}</div>
-            <div className="text-xs text-slate-500 font-medium">کل افتخارات ثبت‌شده</div>
+            <div className="text-xs text-slate-500 font-medium">کل افتخارات مجتمع</div>
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex items-center gap-4">
           <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600">
-            <BookOpen className="w-6 h-6" />
+            <CheckCircle2 className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-black text-navy-950 font-mono">{quranCount}</div>
-            <div className="text-xs text-slate-500 font-medium">مسابقات قرآنی و تواشیح</div>
+            <div className="text-2xl font-black text-navy-950 font-mono">{publishedCount}</div>
+            <div className="text-xs text-slate-500 font-medium">منتشر شده در سایت</div>
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex items-center gap-4">
+          <div className="p-3 rounded-2xl bg-slate-100 text-slate-600">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="text-2xl font-black text-navy-950 font-mono">{draftCount}</div>
+            <div className="text-xs text-slate-500 font-medium">پیش‌نویس / غیرفعال</div>
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex items-center gap-4">
           <div className="p-3 rounded-2xl bg-blue-50 text-blue-600">
-            <GraduationCap className="w-6 h-6" />
+            <ImageIcon className="w-6 h-6" />
           </div>
           <div>
-            <div className="text-2xl font-black text-navy-950 font-mono">{konkurCount}</div>
-            <div className="text-xs text-slate-500 font-medium">رتبه‌های برتر کنکور</div>
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-purple-50 text-purple-600">
-            <Award className="w-6 h-6" />
-          </div>
-          <div>
-            <div className="text-2xl font-black text-navy-950 font-mono">{olympiadCount}</div>
-            <div className="text-xs text-slate-500 font-medium">المپیادها و جشنواره‌ها</div>
+            <div className="text-2xl font-black text-navy-950 font-mono">{withImageCount}</div>
+            <div className="text-xs text-slate-500 font-medium">همراه با عکس / لوح</div>
           </div>
         </div>
       </div>
 
       {/* Filters & Search Toolbar */}
       <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full md:w-72">
+        <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-3" />
           <input
             type="text"
-            placeholder="جستجو در عنوان یا دریافت‌کننده..."
+            placeholder="جستجو در عنوان، برگزیده یا شرح..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pr-10 pl-3 py-2 text-xs focus:outline-none focus:border-turquoise-500"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl pr-10 pl-4 py-2 text-xs focus:outline-none focus:border-turquoise-500 transition-colors"
           />
         </div>
 
-        <div className="flex items-center gap-3 w-full md:w-auto flex-wrap">
-          <div className="flex items-center gap-2">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
-            <select
-              value={filterSchool}
-              onChange={(e) => setFilterSchool(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none"
-            >
-              <option value="all">همه مدارس</option>
-              {schools.map((s) => (
-                <option key={s.id} value={String(s.id)}>{s.shortName}</option>
-              ))}
-            </select>
-          </div>
-
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none"
+        <div className="flex items-center gap-2 w-full md:w-auto">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              statusFilter === 'all'
+                ? 'bg-navy-950 text-white shadow-xs'
+                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
           >
-            <option value="all">همه موضوعات</option>
-            {categories.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+            همه ({totalCount})
+          </button>
+          <button
+            onClick={() => setStatusFilter('published')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              statusFilter === 'published'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            منتشر شده ({publishedCount})
+          </button>
+          <button
+            onClick={() => setStatusFilter('draft')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              statusFilter === 'draft'
+                ? 'bg-slate-700 text-white shadow-xs'
+                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            پیش‌نویس ({draftCount})
+          </button>
         </div>
       </div>
 
-      {/* Achievements Table */}
-      <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
+      {/* Table Card */}
+      <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
         {loading ? (
-          <div className="text-center py-12 text-slate-400 text-xs">در حال بارگذاری اطلاعات...</div>
+          <div className="p-12 text-center text-slate-400 text-xs">در حال دریافت فهرست افتخارات...</div>
         ) : filteredList.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-right text-xs">
-              <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+              <thead className="bg-slate-50/80 text-slate-500 border-b border-slate-100">
                 <tr>
-                  <th className="p-4">تصویر</th>
-                  <th className="p-4">سال</th>
-                  <th className="p-4">عنوان افتخار</th>
-                  <th className="p-4">دریافت‌کننده</th>
-                  <th className="p-4">مدرسه / مقطع</th>
-                  <th className="p-4">دسته‌بندی</th>
-                  <th className="p-4 text-center">وضعیت</th>
-                  <th className="p-4 text-center">عملیات</th>
+                  <th className="p-4 font-bold">عنوان دستاورد / افتخار</th>
+                  <th className="p-4 font-bold">فرد یا تیم برگزیده</th>
+                  <th className="p-4 font-bold">سال</th>
+                  <th className="p-4 font-bold text-center">تصویر</th>
+                  <th className="p-4 font-bold text-center">وضعیت انتشار</th>
+                  <th className="p-4 font-bold text-center">عملیات</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredList.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-4 whitespace-nowrap">
+                  <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="p-4 font-bold text-navy-950 max-w-xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-amber-50 text-amber-600 flex-shrink-0">
+                          <Trophy className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <div className="line-clamp-2 leading-relaxed">{item.title}</div>
+                          {item.description && (
+                            <div className="text-[11px] text-slate-400 line-clamp-1 mt-0.5 font-normal">
+                              {item.description}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4 text-slate-700">
+                      {item.recipient ? (
+                        <span className="font-semibold">{item.recipient}</span>
+                      ) : (
+                        <span className="text-slate-400">مجتمع هدی</span>
+                      )}
+                    </td>
+                    <td className="p-4 text-slate-600 font-mono font-bold">
+                      {item.year || '۱۴۰۳'}
+                    </td>
+                    <td className="p-4 text-center">
                       {item.imageUrl ? (
                         <img
                           src={item.imageUrl}
                           alt={item.title}
-                          className="w-10 h-10 rounded-xl object-cover border border-slate-200 shadow-2xs"
+                          className="w-10 h-10 rounded-xl object-cover border border-slate-200 mx-auto shadow-xs"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
-                          <Trophy className="w-4 h-4 text-slate-300" />
-                        </div>
+                        <span className="text-slate-300 text-[11px]">—</span>
                       )}
                     </td>
-                    <td className="p-4 font-mono font-bold text-slate-700 whitespace-nowrap">
-                      {item.year}
-                    </td>
-                    <td className="p-4 font-bold text-navy-950 max-w-xs">
-                      <div className="truncate">{item.title}</div>
-                      {item.description && (
-                        <div className="text-[11px] text-slate-400 font-normal truncate mt-0.5">
-                          {item.description}
-                        </div>
-                      )}
-                    </td>
-                    <td className="p-4 text-slate-700 whitespace-nowrap">
-                      {item.recipient || '—'}
-                    </td>
-                    <td className="p-4 text-slate-600 whitespace-nowrap">
-                      <span className="bg-slate-100 px-2 py-0.5 rounded text-[11px]">
-                        {item.schoolName || item.school?.shortName || 'عمومی'}
-                      </span>
-                    </td>
-                    <td className="p-4 whitespace-nowrap">
-                      <span className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200/60 rounded-lg font-medium text-[11px]">
-                        {item.category}
-                      </span>
-                    </td>
-                    <td className="p-4 text-center whitespace-nowrap">
+                    <td className="p-4 text-center">
                       <button
                         onClick={() => handleTogglePublished(item)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold cursor-pointer transition-colors ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-colors cursor-pointer ${
                           item.isPublished !== false
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
                             : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'
@@ -354,7 +332,7 @@ export default function AdminAchievements() {
                         {item.isPublished !== false ? (
                           <>
                             <Check className="w-3 h-3" />
-                            <span>منتشرشده</span>
+                            <span>منتشر شده</span>
                           </>
                         ) : (
                           <>
@@ -389,7 +367,7 @@ export default function AdminAchievements() {
           </div>
         ) : (
           <div className="p-12 text-center text-slate-400 text-xs">
-            هیچ افتخاری با معیارهای فعلی یافت نشد.
+            هیچ افتخاری با معیارهای جستجوی فعلی یافت نشد.
           </div>
         )}
       </div>
@@ -401,20 +379,20 @@ export default function AdminAchievements() {
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="text-base font-bold text-navy-950 flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-amber-500" />
-                <span>ثبت افتخار جدید در تالار</span>
+                <span>ثبت افتخار جدید در مجتمع هدی</span>
               </h3>
               <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateSubmit} className="space-y-3.5">
+            <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">عنوان افتخار *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">عنوان افتخار یا دستاورد *</label>
                 <input
                   type="text"
                   required
-                  placeholder="مثال: کسب رتبه ۹ کشوری در کنکور سراسری تجربی"
+                  placeholder="مثال: کسب رتبه اول کشوری در مسابقات همخوانی و قرآن کریم"
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:border-turquoise-500"
@@ -426,10 +404,10 @@ export default function AdminAchievements() {
                   <label className="block text-xs font-bold text-slate-700 mb-1">نام فرد یا تیم برگزیده</label>
                   <input
                     type="text"
-                    placeholder="مثال: محمدصادق نوری"
+                    placeholder="مثال: گروه سرود و نغمه‌های قرآنی"
                     value={form.recipient}
                     onChange={(e) => setForm({ ...form, recipient: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:border-turquoise-500"
                   />
                 </div>
 
@@ -441,68 +419,40 @@ export default function AdminAchievements() {
                     placeholder="مثال: ۱۴۰۳"
                     value={form.year}
                     onChange={(e) => setForm({ ...form, year: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:border-turquoise-500"
                   />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">مدرسه مربوطه</label>
-                  <select
-                    value={form.schoolId}
-                    onChange={(e) => setForm({ ...form, schoolId: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"
-                  >
-                    {schools.map((s) => (
-                      <option key={s.id} value={String(s.id)}>{s.shortName}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">دسته‌بندی موضوعی</label>
-                  <select
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"
-                  >
-                    {categories.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
                 </div>
               </div>
 
               {/* Image Upload for Achievement */}
               <ImageUploadField
-                label="تصویر افتخار، مدال یا تقدیرنامه"
+                label="تصویر افتخار، مدال یا لوح تقدیر"
                 value={form.imageUrl}
                 onChange={(url) => setForm({ ...form, imageUrl: url })}
-                helperText="آپلود تصویر لوح تقدیر، مدال یا عکس فرد برگزیده"
+                helperText="تصویر لوح تقدیر، مدال یا عکس مراسم اهدای جوایز"
               />
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">توضیحات و جزئیات تکمیلی</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">شرح و جزئیات تکمیلی</label>
                 <textarea
                   rows={3}
-                  placeholder="شرح جزئیات، رتبه، دانشگاه قبولی یا دستاورد..."
+                  placeholder="توضیحات دستاورد، رتبه، برگزارکننده یا بازتاب افتخار..."
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:border-turquoise-500"
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
+              <div className="flex items-center gap-2 pt-1">
                 <input
                   type="checkbox"
-                  id="publishedCheck"
+                  id="addPublishedCheck"
                   checked={form.isPublished}
                   onChange={(e) => setForm({ ...form, isPublished: e.target.checked })}
                   className="w-4 h-4 rounded text-turquoise-600 focus:ring-0 cursor-pointer"
                 />
-                <label htmlFor="publishedCheck" className="text-xs font-bold text-slate-700 cursor-pointer">
-                  انتشار عمومی در تالار افتخارات سایت
+                <label htmlFor="addPublishedCheck" className="text-xs font-bold text-slate-700 cursor-pointer">
+                  انتشار فوری در تالار افتخارات سایت
                 </label>
               </div>
 
@@ -541,13 +491,13 @@ export default function AdminAchievements() {
               </button>
             </div>
 
-            <form onSubmit={handleEditSubmit} className="space-y-3.5">
+            <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">عنوان افتخار *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">عنوان افتخار یا دستاورد *</label>
                 <input
                   type="text"
                   required
-                  value={editingItem.title}
+                  value={editingItem.title || ''}
                   onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:border-turquoise-500"
                 />
@@ -560,7 +510,7 @@ export default function AdminAchievements() {
                     type="text"
                     value={editingItem.recipient || ''}
                     onChange={(e) => setEditingItem({ ...editingItem, recipient: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:border-turquoise-500"
                   />
                 </div>
 
@@ -569,51 +519,23 @@ export default function AdminAchievements() {
                   <input
                     type="text"
                     required
-                    value={editingItem.year}
+                    value={editingItem.year || ''}
                     onChange={(e) => setEditingItem({ ...editingItem, year: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none focus:border-turquoise-500"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">مدرسه مربوطه</label>
-                  <select
-                    value={editingItem.schoolId}
-                    onChange={(e) => setEditingItem({ ...editingItem, schoolId: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"
-                  >
-                    {schools.map((s) => (
-                      <option key={s.id} value={String(s.id)}>{s.shortName}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">دسته‌بندی موضوعی</label>
-                  <select
-                    value={editingItem.category}
-                    onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:outline-none"
-                  >
-                    {categories.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Image Upload for Achievement Edit */}
+              {/* Image Upload for Achievement */}
               <ImageUploadField
-                label="تصویر افتخار، مدال یا تقدیرنامه"
+                label="تصویر افتخار، مدال یا لوح تقدیر"
                 value={editingItem.imageUrl || ''}
                 onChange={(url) => setEditingItem({ ...editingItem, imageUrl: url })}
-                helperText="امکان تغییر یا حذف تصویر قبلی افتخار"
+                helperText="تصویر لوح تقدیر، مدال یا عکس مراسم اهدای جوایز"
               />
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">توضیحات و جزئیات تکمیلی</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1">شرح و جزئیات تکمیلی</label>
                 <textarea
                   rows={3}
                   value={editingItem.description || ''}
@@ -622,7 +544,7 @@ export default function AdminAchievements() {
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
+              <div className="flex items-center gap-2 pt-1">
                 <input
                   type="checkbox"
                   id="editPublishedCheck"
@@ -631,7 +553,7 @@ export default function AdminAchievements() {
                   className="w-4 h-4 rounded text-turquoise-600 focus:ring-0 cursor-pointer"
                 />
                 <label htmlFor="editPublishedCheck" className="text-xs font-bold text-slate-700 cursor-pointer">
-                  انتشار عمومی در تالار افتخارات سایت
+                  انتشار در تالار افتخارات سایت
                 </label>
               </div>
 
@@ -646,7 +568,7 @@ export default function AdminAchievements() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 bg-turquoise-600 hover:bg-turquoise-500 text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer disabled:opacity-50"
                 >
                   {submitting ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
                 </button>
