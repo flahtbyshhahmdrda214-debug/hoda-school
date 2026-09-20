@@ -63,17 +63,17 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
   };
 
   return (
-    <section className="relative w-full min-h-[96vh] lg:min-h-screen flex flex-col justify-between overflow-hidden bg-slate-950">
+    <section className="relative w-full min-h-[96vh] lg:min-h-screen flex flex-col justify-between overflow-hidden bg-slate-900">
       {/* Background Image: The authentic campus building photo */}
       <div className="absolute inset-0 z-0">
         <img
           src="/assets/hero-bg.png"
           alt="ساختمان و محوطه مجتمع آموزشی قرآنی هدی"
-          className="w-full h-full object-cover object-center scale-105 transform motion-safe:transition-transform duration-1000 ease-out"
+          className="w-full h-full object-cover object-center scale-105 transform motion-safe:transition-transform duration-1000 ease-out brightness-110 contrast-[1.03]"
         />
-        {/* Multi-layer cinematic dark gradient for crystal-clear readability over photographic background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/45 to-slate-950/95 pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-slate-950/20 to-slate-950/80 pointer-events-none" />
+        {/* Balanced light-permeable gradient for a brighter, vivid campus view while keeping text high-contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/20 to-slate-950/65 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-transparent to-slate-950/40 pointer-events-none" />
       </div>
 
       {/* Top Header & 4 Floating School Portals */}
