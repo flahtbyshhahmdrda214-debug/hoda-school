@@ -4,14 +4,14 @@ import { getCurrentUser, logout } from '../../services/authService';
 import { 
   LayoutDashboard, School, Newspaper, Users, Building2, 
   FileText, Image, Settings, ShieldCheck, History, LogOut, ExternalLink, Menu, X, Trophy, Type, UserCheck,
-  ChevronUp, ChevronDown, RefreshCw, ArrowUp, Clock, Sparkles, CheckCircle2
+  ChevronUp, ChevronDown, RefreshCw, ArrowUp, Clock, Sparkles, CheckCircle2, ChevronRight, ChevronLeft
 } from 'lucide-react';
 
 export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [footerExpanded, setFooterExpanded] = useState(false);
+  const [sidePanelOpen, setSidePanelOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const mainRef = useRef(null);
   const user = getCurrentUser() || { fullName: 'مدیر سیستم', role: 'SUPERADMIN' };
@@ -150,7 +150,21 @@ export default function AdminLayout() {
             <h1 className="text-base font-bold text-navy-950">سامانه مدیریت محتوای هدی</h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Quick Trigger Button for Vertical Side Panel */}
+            <button
+              onClick={() => setSidePanelOpen(!sidePanelOpen)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-turquoise-50 hover:text-turquoise-800 text-slate-700 text-xs font-bold border border-slate-200 transition-all cursor-pointer shadow-xs"
+              title="باز و بسته کردن پنل عمودی کنار صفحه"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-turquoise-600" />
+              <span className="hidden sm:inline">ابزارها و مانیتورینگ</span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+            </button>
+
             <div className="text-left hidden sm:block">
               <div className="text-xs font-bold text-navy-950">{user.fullName}</div>
               <div className="text-[10px] text-slate-500 font-mono">{user.role}</div>
@@ -202,186 +216,184 @@ export default function AdminLayout() {
           <Outlet />
         </main>
 
-        {/* Dynamic Expandable Admin Footer (فوتر دینامیک با قابلیت باز و بسته شدن فهرست) */}
-        <footer className="bg-navy-950 border-t border-navy-800 text-white z-30 shadow-2xl transition-all duration-300 flex-shrink-0">
-          
-          {/* Expanded Drawer (فهرست باز شونده و جمع شونده ابزارها و صفحات) */}
+        {/* Vertical Side Panel (جایگزین عمودی فوتر در کنار صفحه با قابلیت باز و جمع شدن) */}
+        
+        {/* 1. Backdrop Overlay when Side Panel is open */}
+        {sidePanelOpen && (
           <div 
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              footerExpanded ? 'max-h-[600px] border-b border-navy-800/90 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
-            }`}
+            onClick={() => setSidePanelOpen(false)}
+            className="fixed inset-0 bg-navy-950/40 backdrop-blur-xs z-40 transition-opacity"
+          />
+        )}
+
+        {/* 2. Vertical Floating Tab on Left Edge (زبانه عمودی چسبان در کنار صفحه) */}
+        <div className="fixed left-0 top-1/2 -translate-y-1/2 z-40 select-none">
+          <button
+            onClick={() => setSidePanelOpen(!sidePanelOpen)}
+            className="flex flex-col items-center gap-2.5 py-4 px-2 rounded-r-2xl bg-navy-950/95 hover:bg-navy-900 text-white border-y border-r border-turquoise-500/40 shadow-[4px_0_20px_rgba(0,0,0,0.35)] backdrop-blur-md transition-all duration-300 group cursor-pointer hover:pl-2.5"
+            title="کلیک کنید: باز و بسته کردن فهرست و ابزارهای سریع"
           >
-            <div className="p-4 sm:p-6 bg-navy-900/95 backdrop-blur-xl space-y-5">
-              
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-navy-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-turquoise-500/10 border border-turquoise-500/30 flex items-center justify-center text-turquoise-400">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
-                      <span>فهرست دسترسی سریع و مانیتورینگ سیستم</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-turquoise-500/20 text-turquoise-300 font-mono">
-                        CMS v2.5
-                      </span>
-                    </h3>
-                    <p className="text-[11px] text-slate-400">
-                      دسترسی مستقیم به تمامی صفحات مدیریت محتوا و ابزارهای مانیتورینگ
-                    </p>
-                  </div>
-                </div>
+            {/* Live Server Pulse Dot */}
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setFooterExpanded(false)}
-                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs font-semibold border border-navy-700 transition-colors cursor-pointer"
-                  >
-                    <ChevronDown className="w-4 h-4 text-rose-400" />
-                    <span>جمع کردن فهرست</span>
-                  </button>
-                </div>
+            {/* Sparkles Icon */}
+            <Sparkles className="w-4 h-4 text-turquoise-400 group-hover:rotate-45 transition-transform duration-300" />
+
+            {/* Vertical Persian Text */}
+            <span 
+              className="text-[11px] font-bold tracking-wider text-slate-300 group-hover:text-turquoise-300 transition-colors py-2 [writing-mode:vertical-rl] rotate-180"
+            >
+              فهرست و ابزارهای سریع
+            </span>
+
+            {/* Chevron Indicator */}
+            <ChevronRight className={`w-4 h-4 text-turquoise-400 transition-transform duration-300 ${sidePanelOpen ? 'rotate-180' : 'animate-pulse'}`} />
+          </button>
+        </div>
+
+        {/* 3. Vertical Side Drawer Panel (پنل کشویی عمودی با فهرست کامل و ابزارها) */}
+        <aside
+          className={`fixed left-0 top-0 bottom-0 w-80 sm:w-96 bg-navy-950 text-white z-50 border-r border-navy-800 shadow-[-10px_0_40px_rgba(0,0,0,0.5)] flex flex-col transition-transform duration-300 ease-in-out ${
+            sidePanelOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          {/* Drawer Header */}
+          <div className="p-4 sm:p-5 border-b border-navy-800 flex items-center justify-between bg-navy-900/60">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-turquoise-500/15 border border-turquoise-500/30 flex items-center justify-center text-turquoise-400 shadow-inner">
+                <Sparkles className="w-4 h-4" />
               </div>
-
-              {/* Navigation Grid (فهرست کامل بخش‌ها) */}
               <div>
-                <div className="text-[11px] font-bold text-slate-400 mb-2.5 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-turquoise-400"></span>
-                  <span>صفحات و ماژول‌های فعال پنل مدیریت:</span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-2.5">
-                  {navItems.map((item) => {
-                    const Icon = item.icon;
-                    const active = isActive(item.to);
-                    return (
-                      <Link
-                        key={item.to}
-                        to={item.to}
-                        onClick={() => setFooterExpanded(false)}
-                        className={`flex items-center gap-2.5 p-2.5 rounded-xl text-xs font-semibold transition-all border ${
-                          active
-                            ? 'bg-turquoise-600 text-white border-turquoise-500 shadow-md shadow-turquoise-900/30'
-                            : 'bg-navy-950/70 hover:bg-navy-800 text-slate-300 hover:text-white border-navy-800/80 hover:border-turquoise-500/40'
-                        }`}
-                      >
-                        <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-white' : 'text-turquoise-400'}`} />
-                        <span className="truncate">{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* System Stats & Quick Actions Toolbar */}
-              <div className="pt-3 border-t border-navy-800/80 flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
-                
-                {/* Status Badges */}
-                <div className="flex flex-wrap items-center gap-2.5 text-[11px] text-slate-400">
-                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>اتصال ابری Cloudflare Edge برقرار است</span>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <span>پنل ابزارها و ماژول‌ها</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-turquoise-500/20 text-turquoise-300 font-mono">
+                    CMS v2.5
                   </span>
-                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy-950 border border-navy-800 text-slate-300">
-                    <span>کاربر:</span>
-                    <strong className="text-white">{user.fullName}</strong>
-                    <span className="text-slate-500">({user.role})</span>
-                  </span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={scrollToTop}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs font-medium border border-navy-700 transition-colors cursor-pointer"
-                  >
-                    <ArrowUp className="w-3.5 h-3.5 text-turquoise-400" />
-                    <span>اسکرول به بالا</span>
-                  </button>
-                  <button
-                    onClick={() => window.location.reload()}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white text-xs font-medium border border-navy-700 transition-colors cursor-pointer"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-                    <span>بروزرسانی اطلاعات</span>
-                  </button>
-                  <a
-                    href="/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-turquoise-600/20 hover:bg-turquoise-600 text-turquoise-300 hover:text-white text-xs font-medium border border-turquoise-500/30 transition-colors"
-                  >
-                    <span>سایت اصلی</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-
+                </h3>
+                <p className="text-[11px] text-slate-400">
+                  دسترسی سریع، ناوبری و مانیتورینگ
+                </p>
               </div>
-
             </div>
+
+            <button
+              onClick={() => setSidePanelOpen(false)}
+              className="p-2 rounded-xl bg-navy-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 border border-navy-700 transition-colors cursor-pointer"
+              title="بستن و جمع کردن منو"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Collapsed Bar / Trigger (نوار کنترل با دکمه باز و بسته کردن پویا) */}
-          <div className="px-4 sm:px-6 py-2.5 flex items-center justify-between text-xs bg-navy-950/95 backdrop-blur-md select-none">
-            
-            {/* Toggle Button */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setFooterExpanded(!footerExpanded)}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer shadow-sm border ${
-                  footerExpanded
-                    ? 'bg-navy-800 text-white border-navy-700 hover:bg-navy-700'
-                    : 'bg-turquoise-600/15 hover:bg-turquoise-600/25 text-turquoise-300 border-turquoise-500/40 hover:border-turquoise-500'
-                }`}
-              >
-                {footerExpanded ? (
-                  <>
-                    <ChevronDown className="w-4 h-4 text-rose-400 transition-transform" />
-                    <span>جمع کردن فهرست فوتر</span>
-                  </>
-                ) : (
-                  <>
-                    <ChevronUp className="w-4 h-4 text-turquoise-400 animate-bounce" />
-                    <span>فهرست ابزارها و صفحات (کلیک جهت باز شدن)</span>
-                  </>
-                )}
-              </button>
-
-              {/* Shamsi Date & Live Clock */}
-              <div className="hidden md:flex items-center gap-2 text-slate-400 text-[11px] font-medium mr-2">
-                <Clock className="w-3.5 h-3.5 text-turquoise-400" />
-                <span>{currentDate}</span>
-                <span className="text-slate-600">|</span>
-                <span className="font-mono text-slate-300 font-bold">{currentTime}</span>
-              </div>
-            </div>
-
-            {/* Status Indicator & Live Link */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-[11px]">
+          {/* System Status & Shamsi Clock Card */}
+          <div className="p-4 border-b border-navy-800 bg-navy-900/30 space-y-2 text-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span className="hidden sm:inline text-slate-400">وضعیت سرور:</span>
-                <span className="text-emerald-400 font-bold">برخط (Active)</span>
+                <span className="text-slate-400">وضعیت سرور:</span>
+                <span className="text-emerald-400 font-bold">برخط (Cloudflare Edge)</span>
               </div>
+              <span className="font-mono text-turquoise-300 font-bold text-[11px]">{currentTime}</span>
+            </div>
 
-              <span className="hidden sm:inline text-slate-700">|</span>
+            <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1.5 border-t border-navy-800/60">
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-turquoise-400" />
+                <span>{currentDate}</span>
+              </div>
+              <span className="text-slate-400">کاربر: <strong className="text-slate-200">{user.fullName}</strong></span>
+            </div>
+          </div>
 
+          {/* Scrollable Vertical Navigation List */}
+          <div className="flex-1 p-4 overflow-y-auto space-y-1.5">
+            <div className="text-[11px] font-bold text-slate-400 mb-2 px-1 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-turquoise-400"></span>
+              <span>فهرست کامل صفحات مدیریت:</span>
+            </div>
+
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.to);
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => setSidePanelOpen(false)}
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all border ${
+                    active
+                      ? 'bg-turquoise-600 text-white border-turquoise-500 shadow-md shadow-turquoise-900/30'
+                      : 'bg-navy-900/50 hover:bg-navy-800 text-slate-300 hover:text-white border-navy-800/70 hover:border-turquoise-500/40'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-turquoise-400'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {active && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/20 text-white">فعال</span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Action Buttons Toolbar */}
+          <div className="p-4 border-t border-navy-800 bg-navy-900/80 space-y-2.5 text-xs">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={scrollToTop}
+                className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white border border-navy-700 transition-colors cursor-pointer"
+              >
+                <ArrowUp className="w-3.5 h-3.5 text-turquoise-400" />
+                <span>اسکرول به بالا</span>
+              </button>
+
+              <button
+                onClick={() => window.location.reload()}
+                className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white border border-navy-700 transition-colors cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+                <span>بروزرسانی</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2">
               <a
                 href="/"
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-navy-900 hover:bg-navy-800 text-slate-300 hover:text-white text-[11px] border border-navy-800 transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-turquoise-600/20 hover:bg-turquoise-600 text-turquoise-300 hover:text-white border border-turquoise-500/30 transition-colors"
               >
-                <span>مشاهده سایت</span>
-                <ExternalLink className="w-3 h-3 text-turquoise-400" />
+                <span>مشاهده سایت اصلی</span>
+                <ExternalLink className="w-3.5 h-3.5" />
               </a>
+
+              <button
+                onClick={handleLogout}
+                className="px-3 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition-colors cursor-pointer"
+                title="خروج از حساب"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
             </div>
 
+            {/* Big Collapse Button */}
+            <button
+              onClick={() => setSidePanelOpen(false)}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-navy-800/90 hover:bg-navy-800 text-slate-300 hover:text-white font-bold border border-navy-700 transition-all cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4 text-rose-400" />
+              <span>جمع کردن و بستن این منو</span>
+            </button>
           </div>
-
-        </footer>
+        </aside>
       </div>
     </div>
   );
