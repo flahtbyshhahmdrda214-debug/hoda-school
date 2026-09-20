@@ -56,6 +56,79 @@ export const DEFAULT_SETTINGS = {
   social_aparat: 'https://aparat.com/hodaschool',
 };
 
+export const INITIAL_MEDIA = [
+  {
+    id: 'media-1',
+    filename: 'hoda-3d-logo-4k.png',
+    originalName: 'نشان سه‌بعدی رسمی مجتمع هدی',
+    mimeType: 'image/png',
+    url: '/assets/hoda-3d-logo-4k.png',
+    thumbnailUrl: '/assets/hoda-3d-logo-4k.png',
+    sizeBytes: 124000,
+    createdAt: '2026-09-01T08:00:00.000Z'
+  },
+  {
+    id: 'media-2',
+    filename: 'hero-bg.png',
+    originalName: 'تصویر سراسرنمای پردیس مجتمع هدی',
+    mimeType: 'image/png',
+    url: '/assets/hero-bg.png',
+    thumbnailUrl: '/assets/hero-bg.png',
+    sizeBytes: 285000,
+    createdAt: '2026-09-02T10:30:00.000Z'
+  },
+  {
+    id: 'media-3',
+    filename: 'director-avatar.png',
+    originalName: 'تصویر پرتره ریاست مجتمع آموزشی',
+    mimeType: 'image/png',
+    url: '/assets/director-avatar.png',
+    thumbnailUrl: '/assets/director-avatar.png',
+    sizeBytes: 92000,
+    createdAt: '2026-09-03T11:15:00.000Z'
+  },
+  {
+    id: 'media-4',
+    filename: 'icon-school1.png',
+    originalName: 'نشان دبستان پسرانه هدی',
+    mimeType: 'image/png',
+    url: '/assets/icon-school1.png',
+    thumbnailUrl: '/assets/icon-school1.png',
+    sizeBytes: 68000,
+    createdAt: '2026-09-04T09:20:00.000Z'
+  },
+  {
+    id: 'media-5',
+    filename: 'icon-school2-board.png',
+    originalName: 'نشان دبیرستان پسرانه هدی',
+    mimeType: 'image/png',
+    url: '/assets/icon-school2-board.png',
+    thumbnailUrl: '/assets/icon-school2-board.png',
+    sizeBytes: 74000,
+    createdAt: '2026-09-05T14:45:00.000Z'
+  },
+  {
+    id: 'media-6',
+    filename: 'icon-school3-books.png',
+    originalName: 'نشان دبستان دخترانه هدی',
+    mimeType: 'image/png',
+    url: '/assets/icon-school3-books.png',
+    thumbnailUrl: '/assets/icon-school3-books.png',
+    sizeBytes: 71000,
+    createdAt: '2026-09-06T12:10:00.000Z'
+  },
+  {
+    id: 'media-7',
+    filename: 'icon-school4-cap.png',
+    originalName: 'نشان دبیرستان دخترانه هدی',
+    mimeType: 'image/png',
+    url: '/assets/icon-school4-cap.png',
+    thumbnailUrl: '/assets/icon-school4-cap.png',
+    sizeBytes: 69000,
+    createdAt: '2026-09-07T16:00:00.000Z'
+  }
+];
+
 export function getItem(key, defaultVal) {
   try {
     const raw = localStorage.getItem(key);
@@ -397,6 +470,10 @@ export function initMockStorage() {
       }
     ];
     setItem(STORAGE_KEYS.ACHIEVEMENTS, initialAchievements);
+  }
+
+  if (!localStorage.getItem(STORAGE_KEYS.MEDIA)) {
+    setItem(STORAGE_KEYS.MEDIA, INITIAL_MEDIA);
   }
 }
 
@@ -776,29 +853,49 @@ export function handleMockRequest(endpoint, options = {}) {
 
   // 7. Media
   if (cleanEndpoint === '/media') {
-    const media = getItem(STORAGE_KEYS.MEDIA, []);
+    const media = getItem(STORAGE_KEYS.MEDIA, INITIAL_MEDIA);
     return { items: media, pagination: { page: 1, limit: 60, total: media.length } };
   }
   if (cleanEndpoint === '/media/upload') {
-    const media = getItem(STORAGE_KEYS.MEDIA, []);
-    const newMedia = {
-      id: `media-${Date.now()}`,
-      filename: `upload-${Date.now()}.webp`,
-      url: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=600&q=80',
-      sizeBytes: 85000,
-      createdAt: new Date().toISOString()
-    };
+    const media = getItem(STORAGE_KEYS.MEDIA, INITIAL_MEDIA);
+    let newMedia = null;
+
+    if (body && (body.dataUrl || body.url || body.filename || body.originalName)) {
+      newMedia = {
+        id: body.id || `media-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        filename: body.filename || body.originalName || `file-${Date.now()}`,
+        originalName: body.originalName || body.filename || `فایل بارگذاری‌شده`,
+        mimeType: body.mimeType || (body.dataUrl?.startsWith('data:image') ? 'image/jpeg' : 'application/octet-stream'),
+        url: body.url || body.dataUrl,
+        thumbnailUrl: body.thumbnailUrl || body.dataUrl || body.url,
+        sizeBytes: body.sizeBytes || 85000,
+        createdAt: new Date().toISOString()
+      };
+    } else {
+      newMedia = {
+        id: `media-${Date.now()}`,
+        filename: `image-${Date.now()}.png`,
+        originalName: `تصویر آپلود شده`,
+        mimeType: 'image/png',
+        url: '/assets/hoda-3d-logo-4k.png',
+        thumbnailUrl: '/assets/hoda-3d-logo-4k.png',
+        sizeBytes: 85000,
+        createdAt: new Date().toISOString()
+      };
+    }
+
     media.unshift(newMedia);
-    setItem(STORAGE_KEYS.MEDIA, media);
+    setItem(STORAGE_KEYS.MEDIA, media.slice(0, 80));
     logAudit('UPLOAD_MEDIA', 'Media', newMedia.id);
     return newMedia;
   }
   if (cleanEndpoint.startsWith('/media/')) {
     const id = cleanEndpoint.replace('/media/', '');
-    const media = getItem(STORAGE_KEYS.MEDIA, []);
+    const media = getItem(STORAGE_KEYS.MEDIA, INITIAL_MEDIA);
     if (method === 'DELETE') {
       const filtered = media.filter(m => String(m.id) !== id);
       setItem(STORAGE_KEYS.MEDIA, filtered);
+      logAudit('DELETE_MEDIA', 'Media', id);
       return { success: true };
     }
   }
@@ -937,4 +1034,10 @@ export function getLiveAchievements(filters = {}) {
   }
   return items;
 }
+
+export function getLiveMedia() {
+  initMockStorage();
+  return getItem(STORAGE_KEYS.MEDIA, INITIAL_MEDIA);
+}
+
 

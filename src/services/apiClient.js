@@ -42,7 +42,7 @@ export async function apiRequest(endpoint, options = {}) {
     const json = await response.json().catch(() => null);
 
     if (!response.ok || !json) {
-      if (response.status === 404) {
+      if (response.status === 404 || response.status === 405 || response.status === 403 || response.status >= 500) {
         return handleMockRequest(endpoint, options);
       }
       const error = new Error(json?.message || 'خطایی در ارتباط با سرور رخ داده است');
