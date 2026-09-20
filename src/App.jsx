@@ -21,9 +21,11 @@ import AdminFacilities from './pages/admin/AdminFacilities';
 import AdminDocuments from './pages/admin/AdminDocuments';
 import AdminMedia from './pages/admin/AdminMedia';
 import AdminSettings from './pages/admin/AdminSettings';
+import AdminTypography from './pages/admin/AdminTypography';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminAuditLogs from './pages/admin/AdminAuditLogs';
 import ProtectedRoute from './components/ProtectedRoute';
+import { initSiteFont } from './services/fontService';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -43,6 +45,11 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  useEffect(() => {
+    const cleanup = initSiteFont();
+    return cleanup;
+  }, []);
+
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -69,6 +76,8 @@ export default function App() {
             <Route path="facilities" element={<AdminFacilities />} />
             <Route path="documents" element={<AdminDocuments />} />
             <Route path="media" element={<AdminMedia />} />
+            <Route path="typography" element={<AdminTypography />} />
+            <Route path="fonts" element={<AdminTypography />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="audit-logs" element={<AdminAuditLogs />} />

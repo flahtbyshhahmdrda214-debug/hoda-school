@@ -2,6 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --font-site: 'Vazirmatn', system-ui, sans-serif;
+}
+
+[data-font="vazirmatn"], :root[data-font="vazirmatn"] {
+  --font-site: 'Vazirmatn', system-ui, sans-serif;
+}
+
+[data-font="estedad"], :root[data-font="estedad"] {
+  --font-site: 'Estedad', system-ui, sans-serif;
+}
+
+[data-font="peyda"], :root[data-font="peyda"] {
+  --font-site: 'Peyda', system-ui, sans-serif;
+}
+
+[data-font="dana"], :root[data-font="dana"] {
+  --font-site: 'Dana', system-ui, sans-serif;
+}
+
+[data-font="noto-naskh"], :root[data-font="noto-naskh"] {
+  --font-site: 'Noto Naskh Arabic', serif, system-ui;
+}
+
+/* Preview typography classes */
+.font-vazirmatn {
+  font-family: 'Vazirmatn', system-ui, sans-serif !important;
+}
+
+.font-estedad {
+  font-family: 'Estedad', system-ui, sans-serif !important;
+}
+
+.font-peyda {
+  font-family: 'Peyda', system-ui, sans-serif !important;
+}
+
+.font-dana {
+  font-family: 'Dana', system-ui, sans-serif !important;
+}
+
+.font-noto-naskh {
+  font-family: 'Noto Naskh Arabic', serif, system-ui !important;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -9,7 +54,8 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-800 font-vazir antialiased overflow-x-hidden;
+    @apply bg-slate-50 text-slate-800 antialiased overflow-x-hidden;
+    font-family: var(--font-site, 'Vazirmatn', system-ui, sans-serif) !important;
   }
 }
 

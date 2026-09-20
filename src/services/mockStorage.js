@@ -23,6 +23,11 @@ export const DEFAULT_SETTINGS = {
     establishedYear: '۱۳۸۵',
     siteSubtitle: 'محیطی شاداب، پویا و امن؛ پیوند تربیت اصیل قرآنی با یادگیری خلاق',
   },
+  typography: {
+    fontFamily: 'vazirmatn',
+    fontName: 'وزیرمتن',
+  },
+  site_font: 'vazirmatn',
   contact: {
     centralOfficePhone: '۰۲۱-۷۷۲۴۱۰۰۰',
     centralOfficeEmail: 'info@hoda-complex.ir',

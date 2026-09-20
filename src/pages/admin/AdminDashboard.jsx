@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiRequest } from '../../services/apiClient';
-import { School, Newspaper, Users, Image, ArrowUpRight, Trophy } from 'lucide-react';
+import { School, Newspaper, Users, Image, ArrowUpRight, Trophy, Type } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
@@ -113,6 +113,13 @@ export default function AdminDashboard() {
             >
               <span>+ آپلود عکس یا فایل سند PDF</span>
               <Image className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/admin/typography"
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-purple-50 hover:text-purple-700 text-xs font-semibold text-slate-700 transition-colors"
+            >
+              <span>+ تنظیم فونت و تایپوگرافی سایت</span>
+              <Type className="w-4 h-4 text-purple-600" />
             </Link>
           </div>
         </div>

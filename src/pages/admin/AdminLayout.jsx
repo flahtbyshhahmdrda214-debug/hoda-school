@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { getCurrentUser, logout } from '../../services/authService';
 import { 
   LayoutDashboard, School, Newspaper, Users, Building2, 
-  FileText, Image, Settings, ShieldCheck, History, LogOut, ExternalLink, Menu, X, Trophy 
+  FileText, Image, Settings, ShieldCheck, History, LogOut, ExternalLink, Menu, X, Trophy, Type 
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -26,6 +26,7 @@ export default function AdminLayout() {
     { label: 'امکانات آموزشی', to: '/admin/facilities', icon: Building2 },
     { label: 'مجوزها و اسناد', to: '/admin/documents', icon: FileText },
     { label: 'مدیریت فایل‌ها و رسانه', to: '/admin/media', icon: Image },
+    { label: 'مدیریت فونت و ظاهر', to: '/admin/typography', icon: Type },
     { label: 'تنظیمات عمومی سایت', to: '/admin/settings', icon: Settings },
   ];
 

@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { apiRequest } from '../../services/apiClient';
-import { Save, Check } from 'lucide-react';
+import { Save, Check, Type, ArrowLeft } from 'lucide-react';
+import { AVAILABLE_FONTS, getActiveFontId, saveSiteFont } from '../../services/fontService';
 
 const INITIAL_SETTINGS = {
   general: {
     siteName: 'مجتمع آموزشی قرآنی هدی',
     establishedYear: '۱۳۸۵'
+  },
+  typography: {
+    fontFamily: 'vazirmatn',
+    fontName: 'وزیرمتن'
   },
   contact: {
     centralOfficePhone: '۰۲۱-۷۷۲۴۱۰۰۰',
@@ -23,6 +29,7 @@ const INITIAL_SETTINGS = {
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState(INITIAL_SETTINGS);
+  const [selectedFont, setSelectedFont] = useState(getActiveFontId());
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -86,6 +93,68 @@ export default function AdminSettings() {
           <span>{message}</span>
         </div>
       )}
+
+      {/* Site Typography & Font Settings */}
+      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-turquoise-50 text-turquoise-700 flex items-center justify-center">
+              <Type className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-navy-950">قلم و تایپوگرافی رسمی وب‌سایت</h3>
+              <p className="text-[11px] text-slate-500">انتخاب قلم فعال سراسر سایت از بین ۵ فونت رسمی و استاندارد فارسی</p>
+            </div>
+          </div>
+          <Link
+            to="/admin/typography"
+            className="flex items-center gap-1.5 text-xs font-bold text-turquoise-600 hover:text-turquoise-700 bg-turquoise-50 px-3 py-1.5 rounded-xl border border-turquoise-200 hover:bg-turquoise-100 transition-colors"
+          >
+            <span>میز کار پیشرفته فونت</span>
+            <ArrowLeft className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+          {AVAILABLE_FONTS.map((font) => {
+            const isSelected = selectedFont === font.id;
+            return (
+              <div
+                key={font.id}
+                onClick={async () => {
+                  setSelectedFont(font.id);
+                  await saveSiteFont(font.id);
+                  setMessage(`قلم کل سایت به «${font.name}» تغییر یافت و ذخیره گردید.`);
+                  setTimeout(() => setMessage(''), 4000);
+                }}
+                className={`p-3.5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                  isSelected
+                    ? 'border-turquoise-500 bg-turquoise-50/40 shadow-xs'
+                    : 'border-slate-200 hover:border-slate-300 bg-slate-50/50'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className={`text-base font-bold text-navy-950 ${font.previewClass}`}>
+                    {font.name}
+                  </span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${font.badgeColor}`}>
+                    {isSelected ? 'قلم فعال' : font.badge}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-snug">
+                  {font.description}
+                </p>
+                <div className="text-[10px] text-slate-400 font-mono flex items-center justify-between border-t border-slate-200/60 pt-1.5 mt-1">
+                  <span>{font.enName}</span>
+                  <span className={isSelected ? 'text-turquoise-600 font-bold' : ''}>
+                    {isSelected ? '✓ انتخاب شده' : 'انتخاب'}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* General Settings */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">

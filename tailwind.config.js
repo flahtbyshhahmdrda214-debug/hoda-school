@@ -36,7 +36,8 @@ export default {
         }
       },
       fontFamily: {
-        vazir: ['Vazirmatn', 'system-ui', 'sans-serif'],
+        vazir: ['var(--font-site)', 'Vazirmatn', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-site)', 'Vazirmatn', 'system-ui', 'sans-serif'],
       },
       animation: {
         'marquee': 'marquee 35s linear infinite',
