@@ -4,13 +4,16 @@ import { getCurrentUser, logout } from '../../services/authService';
 import { 
   LayoutDashboard, School, Newspaper, Users, Building2, 
   FileText, Image, Settings, ShieldCheck, History, LogOut, ExternalLink, Menu, X, Trophy, Type, UserCheck,
-  RefreshCw, ArrowUp, Clock, Sparkles, CheckCircle2, ChevronRight, ChevronLeft
+  RefreshCw, ArrowUp, Clock, Sparkles, CheckCircle2, ChevronRight, ChevronLeft,
+  Smartphone, QrCode
 } from 'lucide-react';
+import SyncModal from '../../components/SyncModal';
 
 export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidePanelOpen, setSidePanelOpen] = useState(false);
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
   const mainRef = useRef(null);
   const user = getCurrentUser() || { fullName: 'مدیر سیستم', role: 'SUPERADMIN' };
@@ -100,6 +103,17 @@ export default function AdminLayout() {
         </div>
 
         <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Mobile Sync Button */}
+          <button
+            onClick={() => setIsSyncModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+            title="همگام‌سازی و انتقال اطلاعات به گوشی"
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">همگام‌سازی با گوشی</span>
+            <span className="sm:hidden">گوشی</span>
+          </button>
+
           {/* Quick Trigger Button for Side Panel */}
           <button
             onClick={() => setSidePanelOpen(!sidePanelOpen)}
@@ -262,6 +276,18 @@ export default function AdminLayout() {
 
         {/* Action Buttons Toolbar */}
         <div className="p-4 border-t border-navy-800 bg-navy-900/80 space-y-2.5 text-xs">
+          {/* Direct Phone Sync Button */}
+          <button
+            onClick={() => {
+              setSidePanelOpen(false);
+              setIsSyncModalOpen(true);
+            }}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold transition-all shadow-md cursor-pointer"
+          >
+            <Smartphone className="w-4 h-4" />
+            <span>همگام‌سازی با گوشی (QR Code)</span>
+          </button>
+
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={scrollToTop}
@@ -310,6 +336,12 @@ export default function AdminLayout() {
           </button>
         </div>
       </aside>
+
+      {/* Synchronize with Phone Modal */}
+      <SyncModal 
+        isOpen={isSyncModalOpen} 
+        onClose={() => setIsSyncModalOpen(false)} 
+      />
 
     </div>
   );

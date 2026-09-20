@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../../services/apiClient';
-import { Save, Check, Type, ArrowLeft } from 'lucide-react';
+import { Save, Check, Type, ArrowLeft, Smartphone, QrCode, Download, Upload, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { AVAILABLE_FONTS, getActiveFontId, saveSiteFont } from '../../services/fontService';
+import SyncModal from '../../components/SyncModal';
+import { downloadBackupFile, restoreFromFile } from '../../services/deviceSyncService';
 
 const INITIAL_SETTINGS = {
   general: {
@@ -32,6 +34,8 @@ export default function AdminSettings() {
   const [selectedFont, setSelectedFont] = useState(getActiveFontId());
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState(null);
 
   useEffect(() => {
     apiRequest('/settings').then((data) => {
@@ -287,6 +291,80 @@ export default function AdminSettings() {
           ذخیره پیوندهای اجتماعی
         </button>
       </div>
+
+      {/* Multi-Device Synchronization & Backup Card */}
+      <div className="bg-gradient-to-tr from-slate-900 via-navy-950 to-slate-900 text-white p-6 sm:p-8 rounded-3xl border border-navy-800 shadow-xl space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-500 to-turquoise-600 flex items-center justify-center text-white shadow-md">
+              <Smartphone className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <span>همگام‌سازی و انتقال به گوشی (چند دستگاهی)</span>
+              </h3>
+              <p className="text-xs text-slate-300 mt-0.5">
+                انتقال فوری کلیه تغییرات، اخبار و افتخارات ویرایش‌شده به تلفن همراه یا سایر سیستم‌ها
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setIsSyncModalOpen(true)}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-black rounded-xl transition-all shadow-md cursor-pointer"
+          >
+            <QrCode className="w-4 h-4" />
+            <span>تولید بارکد QR و همگام‌سازی گوشی</span>
+          </button>
+        </div>
+
+        <div className="pt-4 border-t border-navy-800/80 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <button
+            onClick={downloadBackupFile}
+            className="flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition-colors cursor-pointer"
+          >
+            <Download className="w-4 h-4 text-emerald-400" />
+            <span>دانلود کل دیتابیس (فایل پشتیبان JSON)</span>
+          </button>
+
+          <label className="flex items-center justify-center gap-2 p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition-colors cursor-pointer">
+            <Upload className="w-4 h-4 text-blue-400" />
+            <span>بازیابی فایل دیتابیس در این سیستم</span>
+            <input
+              type="file"
+              accept=".json,application/json"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                try {
+                  const res = await restoreFromFile(file);
+                  setUploadStatus({ success: true, message: `پشتیبان با موفقیت اعمال شد (${res.keysUpdated.length} بخش).` });
+                  setTimeout(() => setUploadStatus(null), 4000);
+                } catch (err) {
+                  setUploadStatus({ success: false, message: err.message });
+                }
+              }}
+              className="hidden"
+            />
+          </label>
+        </div>
+
+        {uploadStatus && (
+          <div className={`p-3 rounded-2xl text-xs font-bold flex items-center gap-2 ${
+            uploadStatus.success ? 'bg-emerald-900/60 text-emerald-200 border border-emerald-700' : 'bg-rose-900/60 text-rose-200 border border-rose-700'
+          }`}>
+            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+            <span>{uploadStatus.message}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Sync Modal */}
+      <SyncModal
+        isOpen={isSyncModalOpen}
+        onClose={() => setIsSyncModalOpen(false)}
+      />
     </div>
   );
 }
+

@@ -8,6 +8,7 @@ import NewsPage from './pages/NewsPage';
 import NewsDetailPage from './pages/NewsDetailPage';
 import CredentialsPage from './pages/CredentialsPage';
 import AboutPage from './pages/AboutPage';
+import SyncPage from './pages/SyncPage';
 
 // Admin Pages
 import AdminLoginPage from './pages/admin/AdminLoginPage';
@@ -62,6 +63,7 @@ export default function App() {
         <Route path="/news/:slug" element={<NewsDetailPage />} />
         <Route path="/credentials" element={<CredentialsPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/sync" element={<SyncPage />} />
 
         {/* Admin Authentication */}
         <Route path="/admin/login" element={<AdminLoginPage />} />
