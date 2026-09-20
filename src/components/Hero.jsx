@@ -93,6 +93,7 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
               <Trophy className="w-3.5 h-3.5" />
               <span>تالار افتخارات</span>
             </a>
+            <a href="#members" className="hover:text-turquoise-300 transition-colors font-medium">ارکان مجتمع</a>
             <a href="#news" className="hover:text-turquoise-400 transition-colors font-medium">اخبار مهم</a>
             <a href="#identity" className="hover:text-turquoise-400 transition-colors font-medium">هویت قرآنی</a>
             <a href="#contact" className="hover:text-turquoise-300 transition-colors font-bold text-turquoise-400 flex items-center gap-1.5">

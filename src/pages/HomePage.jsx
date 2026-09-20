@@ -4,6 +4,7 @@ import Hero from '../components/Hero';
 import CredentialsTicker from '../components/CredentialsTicker';
 import NewsSection from '../components/NewsSection';
 import HonorsSection from '../components/HonorsSection';
+import MembersSection from '../components/MembersSection';
 import IdentitySection from '../components/IdentitySection';
 import Footer from '../components/Footer';
 import SchoolPanelModal from '../components/SchoolPanelModal';
@@ -59,6 +60,9 @@ export default function HomePage() {
 
       {/* Hall of Fame / Honors & Achievements */}
       <HonorsSection />
+
+      {/* Leadership, Board of Trustees & Principals */}
+      <MembersSection />
 
       <NewsSection onSelectNews={setSelectedNews} />
 

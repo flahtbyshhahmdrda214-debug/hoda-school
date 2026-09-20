@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Shield, School, Newspaper, Info, Lock, Trophy } from 'lucide-react';
+import { Menu, X, Shield, School, Newspaper, Info, Lock, Trophy, Users } from 'lucide-react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +9,7 @@ export default function Navbar() {
   const navLinks = [
     { label: 'صفحه اصلی', to: '/', icon: School },
     { label: 'تالار افتخارات', to: '/#honors', icon: Trophy },
+    { label: 'ارکان مجتمع', to: '/#members', icon: Users },
     { label: 'اخبار و اطلاعیه‌ها', to: '/news', icon: Newspaper },
     { label: 'مجوزها و اسناد اعتبار', to: '/credentials', icon: Shield },
     { label: 'درباره مجتمع', to: '/about', icon: Info },
