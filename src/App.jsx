@@ -14,6 +14,7 @@ import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminSchools from './pages/admin/AdminSchools';
+import AdminAchievements from './pages/admin/AdminAchievements';
 import AdminNews from './pages/admin/AdminNews';
 import AdminTeachers from './pages/admin/AdminTeachers';
 import AdminFacilities from './pages/admin/AdminFacilities';
@@ -62,6 +63,7 @@ export default function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="schools" element={<AdminSchools />} />
+            <Route path="achievements" element={<AdminAchievements />} />
             <Route path="news" element={<AdminNews />} />
             <Route path="teachers" element={<AdminTeachers />} />
             <Route path="facilities" element={<AdminFacilities />} />

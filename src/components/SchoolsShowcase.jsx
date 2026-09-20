@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  GraduationCap, 
-  Users, 
-  Trophy, 
-  ArrowLeft, 
-  Sparkles, 
-  BookOpen 
-} from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
 import { fetchSchools } from '../services/schoolsService';
 import { onDataChanged } from '../services/dataEvents';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 
 export default function SchoolsShowcase({ onSelectSchool }) {
   const [schools, setSchools] = useState(schoolsData);
@@ -25,169 +18,101 @@ export default function SchoolsShowcase({ onSelectSchool }) {
     });
     return unsub;
   }, []);
+
   const badgeVariants = {
     1: {
-      headerGradient: 'from-blue-700 to-indigo-800',
-      tagBg: 'bg-blue-50 text-blue-800 border-blue-200',
-      btnBg: 'bg-blue-600 hover:bg-blue-700 text-white',
-      accentColor: 'text-blue-600',
-      ring: 'group-hover:border-blue-400',
+      gradient: 'from-blue-600 to-indigo-700',
+      lightBg: 'bg-blue-50/80 hover:bg-blue-50',
+      border: 'border-blue-200 hover:border-blue-400',
+      accent: 'text-blue-700',
+      badge: 'bg-blue-100/80 text-blue-800',
+      glow: 'group-hover:shadow-blue-200/60',
     },
     2: {
-      headerGradient: 'from-[#0b2246] via-[#143e74] to-[#1e5eb4]',
-      tagBg: 'bg-blue-50 text-blue-900 border-blue-200',
-      btnBg: 'bg-gradient-to-r from-[#0b2246] to-[#1e5eb4] hover:from-[#143e74] hover:to-[#2563eb] text-white',
-      accentColor: 'text-blue-700',
-      ring: 'group-hover:border-blue-400',
+      gradient: 'from-[#0b2246] to-[#1e5eb4]',
+      lightBg: 'bg-sky-50/80 hover:bg-sky-50',
+      border: 'border-sky-200 hover:border-sky-400',
+      accent: 'text-sky-800',
+      badge: 'bg-sky-100/80 text-sky-900',
+      glow: 'group-hover:shadow-sky-200/60',
     },
     3: {
-      headerGradient: 'from-turquoise-700 to-teal-800',
-      tagBg: 'bg-turquoise-50 text-turquoise-800 border-turquoise-200',
-      btnBg: 'bg-turquoise-600 hover:bg-turquoise-700 text-white',
-      accentColor: 'text-turquoise-600',
-      ring: 'group-hover:border-turquoise-400',
+      gradient: 'from-turquoise-600 to-teal-700',
+      lightBg: 'bg-turquoise-50/80 hover:bg-turquoise-50',
+      border: 'border-turquoise-200 hover:border-turquoise-400',
+      accent: 'text-turquoise-700',
+      badge: 'bg-turquoise-100/80 text-turquoise-800',
+      glow: 'group-hover:shadow-turquoise-200/60',
     },
     4: {
-      headerGradient: 'from-[#1e1b4b] via-[#312e81] to-[#4338ca]',
-      tagBg: 'bg-indigo-50 text-indigo-900 border-indigo-200',
-      btnBg: 'bg-indigo-700 hover:bg-indigo-800 text-white',
-      accentColor: 'text-indigo-700',
-      ring: 'group-hover:border-indigo-400',
+      gradient: 'from-indigo-600 to-purple-700',
+      lightBg: 'bg-indigo-50/80 hover:bg-indigo-50',
+      border: 'border-indigo-200 hover:border-indigo-400',
+      accent: 'text-indigo-700',
+      badge: 'bg-indigo-100/80 text-indigo-900',
+      glow: 'group-hover:shadow-indigo-200/60',
     },
   };
 
   return (
-    <section id="schools" className="py-20 bg-white relative overflow-hidden">
-      {/* Background decor */}
-      <div className="absolute top-0 right-0 -mt-24 -mr-24 w-96 h-96 bg-turquoise-50/60 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -mb-24 -ml-24 w-96 h-96 bg-navy-50/60 rounded-full blur-3xl pointer-events-none" />
-
+    <section id="schools" className="py-12 bg-gradient-to-b from-slate-50 to-white relative overflow-hidden border-b border-slate-200/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-turquoise-50 text-turquoise-800 text-xs font-bold mb-3 border border-turquoise-200">
-            <GraduationCap className="w-4 h-4 text-turquoise-600" />
-            زنجیره پیوسته آموزش و پرورش نخبگان
+        {/* Compact Header */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-200/60">
+          <div className="text-center sm:text-right">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-turquoise-50 text-turquoise-800 text-xs font-bold mb-1.5 border border-turquoise-200">
+              <Sparkles className="w-3.5 h-3.5 text-turquoise-600" />
+              <span>دسترسی سریع به مقاطع تحصیلی</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-navy-950 tracking-tight font-vazir">
+              مدارس چهارگانه مجتمع هدی
+            </h2>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-950 tracking-tight font-vazir">
-            مدارس چهارگانه مجتمع هدی
-          </h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
-            از پیش‌دبستان تا کنکور؛ هر مقطع با کادر اختصاصی، هویت قرآنی و برنامه‌ریزی هدفمند برای موفقیت علمی و تربیتی فرزند شما
-          </p>
+          <span className="text-xs text-slate-500 hidden sm:inline-block">
+            برای مشاهده معرفی و امکانات هر مقطع، روی آیکون آن کلیک کنید
+          </span>
         </div>
 
-        {/* 4 Schools Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* 4 Schools Compact Icon Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {schools.map((school) => {
             const v = badgeVariants[school.id] || badgeVariants[1];
-            const teachersCount = Array.isArray(school.teachers) ? school.teachers.length : 0;
-            const honorsCount = Array.isArray(school.honors || school.achievements) ? (school.honors || school.achievements).length : 0;
-            const features = school.quranicProgram?.features || [];
+            const iconUrl = school.icon3d || school.icon3dUrl || '/assets/icon-school1.png';
+            const cleanTag = (school.tag || '').split('(')[0].trim() || 'پیش‌دبستان تا کنکور';
 
             return (
-              <div
+              <button
                 key={school.id}
-                className={`group bg-white rounded-3xl border-2 border-slate-200 ${v.ring} shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col justify-between`}
+                onClick={() => onSelectSchool && onSelectSchool(school)}
+                className={`group text-right p-4 sm:p-5 rounded-3xl ${v.lightBg} border-2 ${v.border} transition-all duration-300 shadow-xs hover:shadow-xl ${v.glow} transform hover:-translate-y-1.5 flex flex-col items-center text-center cursor-pointer relative overflow-hidden focus:outline-none`}
               >
-                <div>
-                  {/* Card Header Banner with color gradient matching the palette */}
-                  <div className={`p-6 bg-gradient-to-r ${v.headerGradient} text-white relative overflow-hidden`}>
-                    {/* Subtle ambient light orb */}
-                    <div className="absolute -top-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-                    <div className="flex items-center justify-between gap-4 relative z-10">
-                      <div>
-                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30">
-                          {school.shortName}
-                        </span>
-                        <h3 className="text-xl sm:text-2xl font-black mt-2 leading-tight drop-shadow-sm">
-                          {school.fullName}
-                        </h3>
-                      </div>
-                      {/* Free-Floating 3D clay icon in banner with motion */}
-                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center flex-shrink-0">
-                        <img
-                          src={school.icon3d || school.icon3dUrl}
-                          alt={school.shortName}
-                          className="w-full h-full object-contain filter drop-shadow-[0_12px_20px_rgba(0,0,0,0.3)] transform group-hover:scale-115 group-hover:-translate-y-1 transition-transform duration-500 pointer-events-none"
-                        />
-                      </div>
-                    </div>
-
-                    <p className="mt-3 text-xs sm:text-sm text-white/90 leading-relaxed font-normal">
-                      {school.subtitle}
-                    </p>
-                  </div>
-
-                  {/* Body Content */}
-                  <div className="p-6">
-                    {/* Key Stats Bar */}
-                    {Array.isArray(school.stats) && school.stats.length > 0 && (
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-2xl bg-slate-50 border border-slate-200/80 mb-6">
-                        {school.stats.map((st, i) => (
-                          <div key={i} className="text-center">
-                            <div className={`text-base sm:text-lg font-black ${v.accentColor}`}>
-                              {st.value}
-                            </div>
-                            <div className="text-[11px] text-slate-500 font-medium">
-                              {st.label}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Overview Paragraph */}
-                    <p className="text-sm text-slate-600 leading-relaxed mb-6">
-                      {school.overview}
-                    </p>
-
-                    {/* Quranic Feature Highlight */}
-                    {school.quranicProgram && (
-                      <div className="p-4 rounded-2xl bg-turquoise-50/50 border border-turquoise-100 mb-6">
-                        <div className="flex items-center gap-2 text-turquoise-800 font-bold text-xs sm:text-sm mb-2">
-                          <BookOpen className="w-4 h-4 text-turquoise-600" />
-                          {school.quranicProgram.title || school.quranicProgramTitle || 'طرح قرآنی رویش نور'}
-                        </div>
-                        {features.length > 0 && (
-                          <ul className="space-y-1.5 text-xs text-slate-600">
-                            {features.slice(0, 2).map((feat, idx) => (
-                              <li key={idx} className="flex items-start gap-2">
-                                <span className="text-turquoise-600 mt-0.5">•</span>
-                                <span>{feat}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Highlights of Teachers & Honors */}
-                    <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-                      <span className="flex items-center gap-1.5 font-medium">
-                        <Users className="w-4 h-4 text-slate-400" />
-                        معرفی {teachersCount} استاد و معلم برجسته
-                      </span>
-                      <span className="flex items-center gap-1.5 font-medium">
-                        <Trophy className="w-4 h-4 text-amber-500" />
-                        {honorsCount} دستاورد و افتخار ثبت شده
-                      </span>
-                    </div>
-                  </div>
+                {/* School 3D Icon Container */}
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-3 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-white/70 rounded-full blur-xl scale-75 group-hover:scale-110 transition-transform duration-500" />
+                  <img
+                    src={iconUrl}
+                    alt={school.shortName}
+                    className="w-full h-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.15)] transform group-hover:scale-115 group-hover:-translate-y-1 transition-all duration-300"
+                  />
                 </div>
 
-                {/* Footer Action */}
-                <div className="p-6 pt-0">
-                  <button
-                    onClick={() => onSelectSchool(school)}
-                    className={`w-full flex items-center justify-center gap-2 py-3.5 px-5 rounded-2xl ${v.btnBg} font-bold text-sm shadow-md hover:shadow-lg transition-all transform active:scale-98 cursor-pointer`}
-                  >
-                    <span>مشاهده مشخصات جامع {school.shortName} (امکانات، اساتید و افتخارات)</span>
-                    <ArrowLeft className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                {/* School Name */}
+                <h3 className="text-sm sm:text-base font-black text-navy-950 group-hover:text-turquoise-700 transition-colors">
+                  {school.shortName}
+                </h3>
+
+                {/* Tag / Stage */}
+                <span className={`mt-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${v.badge}`}>
+                  {cleanTag}
+                </span>
+
+                {/* Quick Link Hint */}
+                <span className="mt-3 text-[11px] font-bold text-slate-500 group-hover:text-turquoise-600 flex items-center gap-1 transition-colors">
+                  <span>مشاهده جزئیات</span>
+                  <ArrowLeft className="w-3 h-3 transform group-hover:-translate-x-0.5 transition-transform" />
+                </span>
+              </button>
             );
           })}
         </div>

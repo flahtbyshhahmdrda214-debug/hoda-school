@@ -4,6 +4,7 @@ import Hero from '../components/Hero';
 import CredentialsTicker from '../components/CredentialsTicker';
 import NewsSection from '../components/NewsSection';
 import SchoolsShowcase from '../components/SchoolsShowcase';
+import HonorsSection from '../components/HonorsSection';
 import IdentitySection from '../components/IdentitySection';
 import Footer from '../components/Footer';
 import SchoolPanelModal from '../components/SchoolPanelModal';
@@ -57,11 +58,13 @@ export default function HomePage() {
 
       <CredentialsTicker onSelectCredential={setSelectedCredential} />
 
-      <NewsSection onSelectNews={setSelectedNews} />
+      {/* 4 Schools Compact Icons Bar */}
+      <SchoolsShowcase onSelectSchool={setSelectedSchool} />
 
-      <div id="schools">
-        <SchoolsShowcase onSelectSchool={setSelectedSchool} />
-      </div>
+      {/* Hall of Fame / Honors & Achievements */}
+      <HonorsSection />
+
+      <NewsSection onSelectNews={setSelectedNews} />
 
       <IdentitySection />
 

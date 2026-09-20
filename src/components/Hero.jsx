@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Sparkles, GraduationCap, PhoneCall, ArrowLeft, BookOpen } from 'lucide-react';
+import { ChevronDown, Sparkles, GraduationCap, PhoneCall, ArrowLeft, BookOpen, Trophy } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
 import { fetchSchools } from '../services/schoolsService';
 import { onDataChanged } from '../services/dataEvents';
@@ -89,7 +89,11 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
             </div>
           </div>
           <div className="hidden sm:flex items-center gap-5 text-slate-200">
-            <a href="#schools" className="hover:text-turquoise-400 transition-colors font-medium">معرفی مدارس چهارگانه</a>
+            <a href="#schools" className="hover:text-turquoise-400 transition-colors font-medium">مدارس چهارگانه</a>
+            <a href="#honors" className="hover:text-amber-300 transition-colors font-medium text-amber-300 flex items-center gap-1">
+              <Trophy className="w-3.5 h-3.5" />
+              <span>تالار افتخارات</span>
+            </a>
             <a href="#news" className="hover:text-turquoise-400 transition-colors font-medium">اخبار مهم</a>
             <a href="#identity" className="hover:text-turquoise-400 transition-colors font-medium">هویت قرآنی</a>
             <a href="#contact" className="hover:text-turquoise-300 transition-colors font-bold text-turquoise-400 flex items-center gap-1.5">
@@ -182,11 +186,11 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
               بررسی مدارس چهارگانه
             </a>
             <a
-              href="#identity"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-950/80 hover:bg-slate-900 text-white font-bold text-sm shadow-xl hover:shadow-2xl border border-white/30 backdrop-blur-md transition-all transform hover:-translate-y-0.5"
+              href="#honors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm shadow-[0_10px_25px_rgba(245,158,11,0.35)] transition-all transform hover:-translate-y-0.5"
             >
-              <Sparkles className="w-4 h-4 text-turquoise-400" />
-              هویت قرآنی و افتخارات
+              <Trophy className="w-4 h-4 text-slate-950" />
+              <span>تالار افتخارات و دستاوردها</span>
             </a>
           </div>
         </div>

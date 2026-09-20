@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiRequest } from '../../services/apiClient';
-import { School, Newspaper, Users, Image, ShieldCheck, ArrowUpRight } from 'lucide-react';
+import { School, Newspaper, Users, Image, ArrowUpRight, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
@@ -9,6 +9,7 @@ export default function AdminDashboard() {
     newsCount: 0,
     teachersCount: 0,
     mediaCount: 0,
+    achievementsCount: 0,
   });
   const [auditLogs, setAuditLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,13 +20,15 @@ export default function AdminDashboard() {
       apiRequest('/news'),
       apiRequest('/teachers'),
       apiRequest('/media'),
+      apiRequest('/achievements'),
       apiRequest('/users/audit-logs?limit=5')
-    ]).then(([schoolsRes, newsRes, teachersRes, mediaRes, logsRes]) => {
+    ]).then(([schoolsRes, newsRes, teachersRes, mediaRes, achsRes, logsRes]) => {
       setStats({
         schoolsCount: schoolsRes.value?.length || 4,
         newsCount: newsRes.value?.pagination?.total || newsRes.value?.items?.length || 4,
         teachersCount: teachersRes.value?.length || 7,
         mediaCount: mediaRes.value?.pagination?.total || 0,
+        achievementsCount: Array.isArray(achsRes.value) ? achsRes.value.length : 10,
       });
       if (logsRes.value?.items) {
         setAuditLogs(logsRes.value.items);
@@ -36,9 +39,10 @@ export default function AdminDashboard() {
 
   const cards = [
     { label: 'مدارس فعال زیرمجموعه', count: stats.schoolsCount, icon: School, color: 'text-blue-600', bg: 'bg-blue-50', to: '/admin/schools' },
-    { label: 'اخبار و اطلاعیه‌های منتشرشده', count: stats.newsCount, icon: Newspaper, color: 'text-turquoise-600', bg: 'bg-turquoise-50', to: '/admin/news' },
-    { label: 'معلمان و اساتید ثبت‌شده', count: stats.teachersCount, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50', to: '/admin/teachers' },
-    { label: 'فایل‌ها و تصاویر بارگذاری‌شده', count: stats.mediaCount, icon: Image, color: 'text-emerald-600', bg: 'bg-emerald-50', to: '/admin/media' },
+    { label: 'افتخارات و دستاوردها', count: stats.achievementsCount, icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-50', to: '/admin/achievements' },
+    { label: 'اخبار و اطلاعیه‌ها', count: stats.newsCount, icon: Newspaper, color: 'text-turquoise-600', bg: 'bg-turquoise-50', to: '/admin/news' },
+    { label: 'معلمان و اساتید', count: stats.teachersCount, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50', to: '/admin/teachers' },
+    { label: 'فایل‌ها و رسانه‌ها', count: stats.mediaCount, icon: Image, color: 'text-emerald-600', bg: 'bg-emerald-50', to: '/admin/media' },
   ];
 
   return (
@@ -82,6 +86,13 @@ export default function AdminDashboard() {
         <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
           <h3 className="text-sm font-bold text-navy-950">اقدامات سریع</h3>
           <div className="space-y-2">
+            <Link
+              to="/admin/achievements"
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-amber-50 hover:text-amber-700 text-xs font-semibold text-slate-700 transition-colors"
+            >
+              <span>+ ثبت افتخار یا مدال جدید</span>
+              <Trophy className="w-4 h-4 text-amber-500" />
+            </Link>
             <Link
               to="/admin/news"
               className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-turquoise-50 hover:text-turquoise-700 text-xs font-semibold text-slate-700 transition-colors"

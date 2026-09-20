@@ -14,6 +14,7 @@ export const STORAGE_KEYS = {
   SETTINGS: 'hoda_settings_db',
   MEDIA: 'hoda_media_db',
   AUDIT_LOGS: 'hoda_audit_logs_db',
+  ACHIEVEMENTS: 'hoda_achievements_db',
 };
 
 export const DEFAULT_SETTINGS = {
@@ -72,8 +73,8 @@ export function setItem(key, val) {
   }
 }
 
-// Helper to merge live teachers and facilities into school objects
-function enrichSchool(school, allTeachers = [], allFacilities = []) {
+// Helper to merge live teachers, facilities and achievements into school objects
+function enrichSchool(school, allTeachers = [], allFacilities = [], allAchievements = []) {
   if (!school) return school;
   const sId = String(school.id);
   const sSlug = school.slug;
@@ -93,10 +94,19 @@ function enrichSchool(school, allTeachers = [], allFacilities = []) {
     (f.school && (String(f.school.id) === sId || f.school.shortName === sName))
   );
 
+  const achievements = allAchievements.filter(a => 
+    String(a.schoolId) === sId || 
+    a.schoolSlug === sSlug || 
+    a.schoolName === sName ||
+    (a.school && (String(a.school.id) === sId || a.school.shortName === sName))
+  );
+
   return {
     ...school,
     teachers: teachers.length > 0 ? teachers : (school.teachers || []),
     facilities: facilities.length > 0 ? facilities : (school.facilities || []),
+    achievements: achievements.length > 0 ? achievements : (school.honors || school.achievements || []),
+    honors: achievements.length > 0 ? achievements : (school.honors || school.achievements || []),
   };
 }
 
@@ -236,6 +246,153 @@ export function initMockStorage() {
       { id: 'l1', action: 'SYSTEM_BOOT', entity: 'System', createdAt: new Date().toISOString(), ipAddress: '127.0.0.1', user: { fullName: 'مدیر کل سامانه', username: 'superadmin' } }
     ]);
   }
+
+  // 9. Achievements & Honors
+  if (!localStorage.getItem(STORAGE_KEYS.ACHIEVEMENTS)) {
+    const initialAchievements = [
+      {
+        id: 'ach-1',
+        schoolId: '1',
+        schoolSlug: 'boys-elementary',
+        schoolName: 'دبستان پسرانه',
+        year: '۱۴۰۳',
+        title: 'کسب رتبه اول مسابقات استانی همخوانی، اذان و تواشیح مدارس',
+        recipient: 'گروه سرود و نغمه‌های قرآنی نور هدی',
+        category: 'قرآنی',
+        description: 'کسب عنوان برتر در میان ۶۴ گروه دانش‌آموزی با اجرای هماهنگ و تجوید استاندارد',
+        imageUrl: '',
+        sortOrder: 1,
+        isPublished: true,
+      },
+      {
+        id: 'ach-2',
+        schoolId: '2',
+        schoolSlug: 'boys-highschool',
+        schoolName: 'دبیرستان پسرانه',
+        year: '۱۴۰۳',
+        title: 'کسب رتبه ۹ کشوری در کنکور سراسری علوم تجربی',
+        recipient: 'محمدصادق نوری',
+        category: 'کنکور سراسری',
+        description: 'درخشش در رشته پزشکی دانشگاه علوم پزشکی تهران بدون استفاده از سهمیه',
+        imageUrl: '',
+        sortOrder: 2,
+        isPublished: true,
+      },
+      {
+        id: 'ach-3',
+        schoolId: '2',
+        schoolSlug: 'boys-highschool',
+        schoolName: 'دبیرستان پسرانه',
+        year: '۱۴۰۳',
+        title: 'کسب رتبه ۱۷ کشوری در کنکور سراسری رشته ریاضی و فیزیک',
+        recipient: 'امیرمهدی فیاض',
+        category: 'کنکور سراسری',
+        description: 'پذیرش در رشته مهندسی کامپیوتر دانشگاه صنعتی شریف',
+        imageUrl: '',
+        sortOrder: 3,
+        isPublished: true,
+      },
+      {
+        id: 'ach-4',
+        schoolId: '4',
+        schoolSlug: 'girls-highschool',
+        schoolName: 'دبیرستان دخترانه',
+        year: '۱۴۰۳',
+        title: 'کسب رتبه ۱۲ کشوری در کنکور سراسری علوم انسانی',
+        recipient: 'زهرا میرزایی',
+        category: 'کنکور سراسری',
+        description: 'پذیرش در رشته حقوق دانشگاه تهران با درصد ۱۰۰ در دروس تخصصی',
+        imageUrl: '',
+        sortOrder: 4,
+        isPublished: true,
+      },
+      {
+        id: 'ach-5',
+        schoolId: '4',
+        schoolSlug: 'girls-highschool',
+        schoolName: 'دبیرستان دخترانه',
+        year: '۱۴۰۳',
+        title: 'کسب رتبه ۲۴ کشوری در کنکور سراسری علوم تجربی',
+        recipient: 'فاطمه کاظمی',
+        category: 'کنکور سراسری',
+        description: 'پذیرش در رشته دندانپزشکی دانشگاه علوم پزشکی شهید بهشتی',
+        imageUrl: '',
+        sortOrder: 5,
+        isPublished: true,
+      },
+      {
+        id: 'ach-6',
+        schoolId: '2',
+        schoolSlug: 'boys-highschool',
+        schoolName: 'دبیرستان پسرانه',
+        year: '۱۴۰۲',
+        title: 'مدال نقره المپیاد جهانی نانوفناوری و المپیاد کشوری کامپیوتر',
+        recipient: 'سینا خلیلی',
+        category: 'علمی و المپیاد',
+        description: 'عضو تیم ملی المپیاد دانش‌آموزی با هدایت اساتید المپیاد هدی',
+        imageUrl: '',
+        sortOrder: 6,
+        isPublished: true,
+      },
+      {
+        id: 'ach-7',
+        schoolId: '3',
+        schoolSlug: 'girls-elementary',
+        schoolName: 'دبستان دخترانه',
+        year: '۱۴۰۳',
+        title: 'کسب رتبه اول مسابقات استانی سرود و همخوانی قرآنی دختران',
+        recipient: 'گروه ریحانه‌های بهشتی هدی',
+        category: 'قرآنی',
+        description: 'درخشش در مسابقات سرود و همخوانی قرآن کریم مرحله استانی با نمره کامل هیئت داوران',
+        imageUrl: '',
+        sortOrder: 7,
+        isPublished: true,
+      },
+      {
+        id: 'ach-8',
+        schoolId: '1',
+        schoolSlug: 'boys-elementary',
+        schoolName: 'دبستان پسرانه',
+        year: '۱۴۰۳',
+        title: 'مقام نخست جشنواره جابربن‌حیان در محور طراحی و آزمایش',
+        recipient: 'تیم پژوهشی پایه پنجم',
+        category: 'علمی و المپیاد',
+        description: 'طراحی دستگاه هوشمند تصفیه آب مبتنی بر انرژی خورشیدی',
+        imageUrl: '',
+        sortOrder: 8,
+        isPublished: true,
+      },
+      {
+        id: 'ach-9',
+        schoolId: '3',
+        schoolSlug: 'girls-elementary',
+        schoolName: 'دبستان دخترانه',
+        year: '۱۴۰۲',
+        title: 'برگزیده اول مسابقات حفظ ۱۰ جزء و ترتیل مدارس شهر تهران',
+        recipient: 'فاطمه‌سادات حسینی',
+        category: 'قرآنی',
+        description: 'حافظ مسلط کلام‌الله مجید با لحن و تجوید برجسته',
+        imageUrl: '',
+        sortOrder: 9,
+        isPublished: true,
+      },
+      {
+        id: 'ach-10',
+        schoolId: '4',
+        schoolSlug: 'girls-highschool',
+        schoolName: 'دبیرستان دخترانه',
+        year: '۱۴۰۲',
+        title: 'مدال طلای المپیاد ادبی کشور و برگزیده بنیاد ملی نخبگان',
+        recipient: 'سارا احمدی',
+        category: 'علمی و المپیاد',
+        description: 'کسب مدال طلای کشوری و عضویت رسمی در بنیاد ملی نخبگان',
+        imageUrl: '',
+        sortOrder: 10,
+        isPublished: true,
+      }
+    ];
+    setItem(STORAGE_KEYS.ACHIEVEMENTS, initialAchievements);
+  }
 }
 
 // Request Handler for Client-Side Database
@@ -250,7 +407,8 @@ export function handleMockRequest(endpoint, options = {}) {
     const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
     const teachers = getItem(STORAGE_KEYS.TEACHERS, []);
     const facs = getItem(STORAGE_KEYS.FACILITIES, []);
-    return schools.map(s => enrichSchool(s, teachers, facs));
+    const achs = getItem(STORAGE_KEYS.ACHIEVEMENTS, []);
+    return schools.map(s => enrichSchool(s, teachers, facs, achs));
   }
 
   if (cleanEndpoint.startsWith('/schools/')) {
@@ -263,7 +421,8 @@ export function handleMockRequest(endpoint, options = {}) {
       if (sc) {
         const teachers = getItem(STORAGE_KEYS.TEACHERS, []);
         const facs = getItem(STORAGE_KEYS.FACILITIES, []);
-        return enrichSchool(sc, teachers, facs);
+        const achs = getItem(STORAGE_KEYS.ACHIEVEMENTS, []);
+        return enrichSchool(sc, teachers, facs, achs);
       }
       throw new Error('مدرسه مورد نظر یافت نشد');
     }
@@ -275,7 +434,8 @@ export function handleMockRequest(endpoint, options = {}) {
         logAudit('UPDATE_SCHOOL', 'School', slugOrId);
         const teachers = getItem(STORAGE_KEYS.TEACHERS, []);
         const facs = getItem(STORAGE_KEYS.FACILITIES, []);
-        return enrichSchool(schools[index], teachers, facs);
+        const achs = getItem(STORAGE_KEYS.ACHIEVEMENTS, []);
+        return enrichSchool(schools[index], teachers, facs, achs);
       }
       return body;
     }
@@ -467,7 +627,95 @@ export function handleMockRequest(endpoint, options = {}) {
     }
   }
 
-  // 6. Settings
+  // 6. Achievements / Honors
+  if (cleanEndpoint === '/achievements') {
+    let achs = getItem(STORAGE_KEYS.ACHIEVEMENTS, []);
+    if (method === 'GET') {
+      const queryString = endpoint.includes('?') ? endpoint.split('?')[1] : '';
+      const params = new URLSearchParams(queryString);
+      const cat = params.get('category');
+      const schoolSlug = params.get('schoolSlug');
+      const schoolId = params.get('schoolId');
+
+      if (cat && cat !== 'all' && cat !== 'همه') {
+        achs = achs.filter(a => a.category === cat);
+      }
+      if (schoolSlug) {
+        achs = achs.filter(a => a.schoolSlug === schoolSlug || a.school?.slug === schoolSlug);
+      }
+      if (schoolId) {
+        achs = achs.filter(a => String(a.schoolId) === String(schoolId) || String(a.school?.id) === String(schoolId));
+      }
+      return achs;
+    }
+
+    if (method === 'POST') {
+      const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
+      const sc = schools.find(s => String(s.id) === String(body.schoolId) || s.slug === body.schoolSlug);
+      const newAch = {
+        id: `ach-${Date.now()}`,
+        schoolId: sc ? String(sc.id) : (body.schoolId ? String(body.schoolId) : '1'),
+        schoolSlug: sc ? sc.slug : (body.schoolSlug || 'boys-elementary'),
+        schoolName: sc ? sc.shortName : (body.schoolName || 'دبستان پسرانه'),
+        year: body.year || '۱۴۰۳',
+        title: body.title || 'افتخار جدید',
+        recipient: body.recipient || '',
+        description: body.description || '',
+        category: body.category || 'قرآنی',
+        imageUrl: body.imageUrl || '',
+        sortOrder: Number(body.sortOrder) || 1,
+        isPublished: body.isPublished !== undefined ? Boolean(body.isPublished) : true,
+        createdAt: new Date().toISOString(),
+        school: sc ? { id: sc.id, shortName: sc.shortName, slug: sc.slug } : null,
+      };
+      achs.unshift(newAch);
+      setItem(STORAGE_KEYS.ACHIEVEMENTS, achs);
+      logAudit('CREATE_ACHIEVEMENT', 'Achievement', newAch.id);
+      return newAch;
+    }
+  }
+
+  if (cleanEndpoint.startsWith('/achievements/')) {
+    const id = cleanEndpoint.replace('/achievements/', '');
+    const achs = getItem(STORAGE_KEYS.ACHIEVEMENTS, []);
+    
+    if (method === 'DELETE') {
+      const filtered = achs.filter(a => String(a.id) !== id);
+      setItem(STORAGE_KEYS.ACHIEVEMENTS, filtered);
+      logAudit('DELETE_ACHIEVEMENT', 'Achievement', id);
+      return { success: true };
+    }
+
+    if (method === 'PUT') {
+      const idx = achs.findIndex(a => String(a.id) === id);
+      if (idx !== -1) {
+        const schools = getItem(STORAGE_KEYS.SCHOOLS, schoolsData);
+        const targetSchoolId = body.schoolId !== undefined ? body.schoolId : achs[idx].schoolId;
+        const sc = schools.find(s => String(s.id) === String(targetSchoolId) || s.slug === body.schoolSlug) || achs[idx].school;
+        achs[idx] = {
+          ...achs[idx],
+          ...body,
+          schoolId: sc ? String(sc.id) : achs[idx].schoolId,
+          schoolSlug: sc ? sc.slug : achs[idx].schoolSlug,
+          schoolName: sc ? sc.shortName : achs[idx].schoolName,
+          school: sc ? { id: sc.id, shortName: sc.shortName, slug: sc.slug } : achs[idx].school,
+          updatedAt: new Date().toISOString(),
+        };
+        setItem(STORAGE_KEYS.ACHIEVEMENTS, achs);
+        logAudit('UPDATE_ACHIEVEMENT', 'Achievement', id);
+        return achs[idx];
+      }
+      return body;
+    }
+
+    if (method === 'GET') {
+      const item = achs.find(a => String(a.id) === id);
+      if (item) return item;
+      throw new Error('افتخار مورد نظر یافت نشد');
+    }
+  }
+
+  // 7. Settings
   if (cleanEndpoint === '/settings') {
     const settings = getItem(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
     if (method === 'GET') {
@@ -666,3 +914,22 @@ export function getLiveSettings() {
     socials: { ...DEFAULT_SETTINGS.socials, ...(s.socials || {}) },
   };
 }
+
+export function getLiveAchievements(filters = {}) {
+  initMockStorage();
+  let items = getItem(STORAGE_KEYS.ACHIEVEMENTS, []);
+  if (filters.category && filters.category !== 'all' && filters.category !== 'همه') {
+    items = items.filter(a => a.category === filters.category);
+  }
+  if (filters.schoolSlug) {
+    items = items.filter(a => a.schoolSlug === filters.schoolSlug || a.school?.slug === filters.schoolSlug);
+  }
+  if (filters.schoolId) {
+    items = items.filter(a => String(a.schoolId) === String(filters.schoolId) || String(a.school?.id) === String(filters.schoolId));
+  }
+  if (filters.publishedOnly !== false) {
+    items = items.filter(a => a.isPublished !== false);
+  }
+  return items;
+}
+

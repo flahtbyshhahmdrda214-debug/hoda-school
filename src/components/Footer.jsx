@@ -143,7 +143,10 @@ export default function Footer({ onSelectSchool }) {
             </h5>
             <ul className="space-y-2 text-xs text-slate-400">
               <li>
-                <a href="#schools" className="hover:text-turquoise-400 transition-colors">معرفی مدارس چهارگانه</a>
+                <a href="#schools" className="hover:text-turquoise-400 transition-colors">مدارس چهارگانه هدی</a>
+              </li>
+              <li>
+                <a href="#honors" className="hover:text-turquoise-400 transition-colors">تالار افتخارات و دستاوردها</a>
               </li>
               <li>
                 <a href="#credentials-section" className="hover:text-turquoise-400 transition-colors">اسناد و مجوزهای رسمی</a>
