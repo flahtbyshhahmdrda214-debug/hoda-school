@@ -8,7 +8,7 @@ import {
   Smartphone, QrCode, Cloud, CloudCheck, Wifi
 } from 'lucide-react';
 import SyncModal from '../../components/SyncModal';
-import { onCloudSyncStatusChange, pullFromCloud } from '../../services/cloudSyncService';
+import { onCloudSyncStatusChange, pullFromCloud, pushAllToCloud } from '../../services/cloudSyncService';
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -119,6 +119,7 @@ export default function AdminLayout() {
               if (isManualSyncing) return;
               setIsManualSyncing(true);
               try {
+                await pushAllToCloud();
                 await pullFromCloud(true);
               } catch (e) {
                 console.error(e);
