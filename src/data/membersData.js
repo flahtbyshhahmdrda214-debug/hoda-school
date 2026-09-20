@@ -122,7 +122,7 @@ export const membersData = {
       roleCategory: 'principal',
       roleLabel: 'مدیر مدرسه',
       avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
-      icon3d: '/assets/icon-school3-books.png',
+      icon3d: '/assets/icon-school4-cap.png',
       themeColor: 'turquoise',
       badgeClass: 'bg-turquoise-50 text-turquoise-700 border-turquoise-200',
       degree: 'کارشناسی ارشد روان‌شناسی کودک و حافظ کل کلام‌الله مجید',

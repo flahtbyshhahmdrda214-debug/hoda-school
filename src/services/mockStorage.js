@@ -239,6 +239,16 @@ export function initMockStorage() {
             p.icon3d = '/assets/icon-school2.png';
             mChanged = true;
           }
+        } else if (p.id === 'principal-3' || p.schoolId === 3) {
+          if (p.icon3d !== '/assets/icon-school4-cap.png') {
+            p.icon3d = '/assets/icon-school4-cap.png';
+            mChanged = true;
+          }
+        } else if (p.id === 'principal-4' || p.schoolId === 4) {
+          if (p.icon3d !== '/assets/icon-school4-cap.png') {
+            p.icon3d = '/assets/icon-school4-cap.png';
+            mChanged = true;
+          }
         }
       });
       if (mChanged) {

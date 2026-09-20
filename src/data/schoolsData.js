@@ -166,7 +166,7 @@ export const schoolsData = [
   {
     id: 3,
     slug: 'girls-elementary',
-    icon3d: '/assets/icon-school3-books.png',
+    icon3d: '/assets/icon-school4-cap.png',
     shortName: 'دبستان دخترانه',
     fullName: 'دبستان دخترانه قرآنی هدی (پیش‌دبستان و دوره اول و دوم ابتدایی)',
     subtitle: 'کانون آرامش، شادابی و حیا؛ پرورش نسلی دانا، خلاق و منور به نور کلام وحی',
