@@ -20,6 +20,7 @@ import AdminTeachers from './pages/admin/AdminTeachers';
 import AdminFacilities from './pages/admin/AdminFacilities';
 import AdminDocuments from './pages/admin/AdminDocuments';
 import AdminMedia from './pages/admin/AdminMedia';
+import AdminMembers from './pages/admin/AdminMembers';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminTypography from './pages/admin/AdminTypography';
 import AdminUsers from './pages/admin/AdminUsers';
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="facilities" element={<AdminFacilities />} />
             <Route path="documents" element={<AdminDocuments />} />
             <Route path="media" element={<AdminMedia />} />
+            <Route path="members" element={<AdminMembers />} />
             <Route path="typography" element={<AdminTypography />} />
             <Route path="fonts" element={<AdminTypography />} />
             <Route path="settings" element={<AdminSettings />} />

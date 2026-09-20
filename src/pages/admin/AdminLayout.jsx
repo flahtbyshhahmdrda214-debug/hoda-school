@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { getCurrentUser, logout } from '../../services/authService';
 import { 
   LayoutDashboard, School, Newspaper, Users, Building2, 
-  FileText, Image, Settings, ShieldCheck, History, LogOut, ExternalLink, Menu, X, Trophy, Type 
+  FileText, Image, Settings, ShieldCheck, History, LogOut, ExternalLink, Menu, X, Trophy, Type, UserCheck 
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -20,6 +20,7 @@ export default function AdminLayout() {
   const navItems = [
     { label: 'پیشخوان و آمار', to: '/admin', icon: LayoutDashboard },
     { label: 'مدارس چهارگانه', to: '/admin/schools', icon: School },
+    { label: 'ارکان و مدیران مجتمع', to: '/admin/members', icon: UserCheck },
     { label: 'تالار افتخارات', to: '/admin/achievements', icon: Trophy },
     { label: 'اخبار و اطلاعیه‌ها', to: '/admin/news', icon: Newspaper },
     { label: 'اساتید و معلمان', to: '/admin/teachers', icon: Users },

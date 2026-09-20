@@ -4,6 +4,7 @@
 import { schoolsData } from '../data/schoolsData.js';
 import { newsData } from '../data/newsData.js';
 import { credentialsData } from '../data/credentialsData.js';
+import { membersData } from '../data/membersData.js';
 
 export const STORAGE_KEYS = {
   SCHOOLS: 'hoda_schools_db',
@@ -15,6 +16,7 @@ export const STORAGE_KEYS = {
   MEDIA: 'hoda_media_db',
   AUDIT_LOGS: 'hoda_audit_logs_db',
   ACHIEVEMENTS: 'hoda_achievements_db',
+  MEMBERS: 'hoda_members_db',
 };
 
 export const DEFAULT_SETTINGS = {
@@ -475,6 +477,10 @@ export function initMockStorage() {
   if (!localStorage.getItem(STORAGE_KEYS.MEDIA)) {
     setItem(STORAGE_KEYS.MEDIA, INITIAL_MEDIA);
   }
+
+  if (!localStorage.getItem(STORAGE_KEYS.MEMBERS)) {
+    setItem(STORAGE_KEYS.MEMBERS, membersData);
+  }
 }
 
 // Request Handler for Client-Side Database
@@ -900,7 +906,97 @@ export function handleMockRequest(endpoint, options = {}) {
     }
   }
 
-  // 8. Users & Audit Logs
+  // 8. Members & Leadership
+  if (cleanEndpoint === '/members') {
+    const mems = getItem(STORAGE_KEYS.MEMBERS, membersData);
+    if (method === 'GET') {
+      return mems;
+    }
+    if (method === 'PUT') {
+      const updated = {
+        ...mems,
+        ...body,
+        director: body.director ? { ...(mems.director || {}), ...body.director } : (mems.director || {}),
+        trustees: body.trustees || mems.trustees || [],
+        principals: body.principals || mems.principals || []
+      };
+      setItem(STORAGE_KEYS.MEMBERS, updated);
+      logAudit('UPDATE_MEMBERS', 'Member', 'all');
+      return updated;
+    }
+  }
+
+  if (cleanEndpoint === '/members/director' && method === 'PUT') {
+    const mems = getItem(STORAGE_KEYS.MEMBERS, membersData);
+    mems.director = { ...(mems.director || {}), ...body };
+    setItem(STORAGE_KEYS.MEMBERS, mems);
+    logAudit('UPDATE_DIRECTOR', 'Member', 'director');
+    return mems.director;
+  }
+
+  if (cleanEndpoint === '/members/trustees') {
+    const mems = getItem(STORAGE_KEYS.MEMBERS, membersData);
+    if (method === 'POST') {
+      const newTrustee = {
+        id: `trustee-${Date.now()}`,
+        name: body.name || 'عضو جدید هیئت امنا',
+        title: body.title || 'عضو هیئت امنا',
+        roleCategory: 'trustee',
+        roleLabel: 'هیئت امنا',
+        avatar: body.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+        degree: body.degree || '',
+        experience: body.experience || '',
+        bio: body.bio || '',
+        highlight: body.highlight || ''
+      };
+      mems.trustees = mems.trustees || [];
+      mems.trustees.push(newTrustee);
+      setItem(STORAGE_KEYS.MEMBERS, mems);
+      logAudit('CREATE_TRUSTEE', 'Member', newTrustee.id);
+      return newTrustee;
+    }
+  }
+
+  if (cleanEndpoint.startsWith('/members/trustees/')) {
+    const id = cleanEndpoint.replace('/members/trustees/', '');
+    const mems = getItem(STORAGE_KEYS.MEMBERS, membersData);
+    mems.trustees = mems.trustees || [];
+
+    if (method === 'DELETE') {
+      mems.trustees = mems.trustees.filter(t => String(t.id) !== id);
+      setItem(STORAGE_KEYS.MEMBERS, mems);
+      logAudit('DELETE_TRUSTEE', 'Member', id);
+      return { success: true };
+    }
+
+    if (method === 'PUT') {
+      const idx = mems.trustees.findIndex(t => String(t.id) === id);
+      if (idx !== -1) {
+        mems.trustees[idx] = { ...mems.trustees[idx], ...body };
+        setItem(STORAGE_KEYS.MEMBERS, mems);
+        logAudit('UPDATE_TRUSTEE', 'Member', id);
+        return mems.trustees[idx];
+      }
+    }
+  }
+
+  if (cleanEndpoint.startsWith('/members/principals/')) {
+    const id = cleanEndpoint.replace('/members/principals/', '');
+    const mems = getItem(STORAGE_KEYS.MEMBERS, membersData);
+    mems.principals = mems.principals || [];
+
+    if (method === 'PUT') {
+      const idx = mems.principals.findIndex(p => String(p.id) === id || String(p.schoolId) === id);
+      if (idx !== -1) {
+        mems.principals[idx] = { ...mems.principals[idx], ...body };
+        setItem(STORAGE_KEYS.MEMBERS, mems);
+        logAudit('UPDATE_PRINCIPAL', 'Member', id);
+        return mems.principals[idx];
+      }
+    }
+  }
+
+  // 9. Users & Audit Logs
   if (cleanEndpoint === '/users') {
     return [
       { id: '1', username: 'superadmin', role: 'SUPERADMIN', fullName: 'مدیر کل سامانه', email: 'superadmin@hoda.ir', isActive: true },
@@ -1039,5 +1135,11 @@ export function getLiveMedia() {
   initMockStorage();
   return getItem(STORAGE_KEYS.MEDIA, INITIAL_MEDIA);
 }
+
+export function getLiveMembers() {
+  initMockStorage();
+  return getItem(STORAGE_KEYS.MEMBERS, membersData);
+}
+
 
 

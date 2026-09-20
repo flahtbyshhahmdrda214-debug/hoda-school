@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { membersData } from '../data/membersData';
+import { fetchMembers } from '../services/membersService';
+import { onDataChanged } from '../services/dataEvents';
 import { 
   Users, Crown, GraduationCap, Building, Award, CheckCircle2, 
   Phone, Mail, ArrowLeft, ExternalLink, X, Quote, Sparkles, BookOpen
@@ -9,8 +11,29 @@ import { Link } from 'react-router-dom';
 export default function MembersSection() {
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'director', 'trustees', 'principals'
   const [selectedMember, setSelectedMember] = useState(null);
+  const [data, setData] = useState(membersData);
 
-  const { director, trustees, principals } = membersData;
+  useEffect(() => {
+    fetchMembers().then(res => {
+      if (res && (res.director || res.trustees || res.principals)) {
+        setData(res);
+      }
+    });
+
+    const unsub = onDataChanged(() => {
+      fetchMembers().then(res => {
+        if (res && (res.director || res.trustees || res.principals)) {
+          setData(res);
+        }
+      });
+    });
+
+    return unsub;
+  }, []);
+
+  const director = data.director || membersData.director;
+  const trustees = data.trustees || membersData.trustees;
+  const principals = data.principals || membersData.principals;
 
   const showDirector = activeTab === 'all' || activeTab === 'director';
   const showTrustees = activeTab === 'all' || activeTab === 'trustees';
