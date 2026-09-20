@@ -1,3 +1,7 @@
+// Cloud Sync Service for Hoda Educational Complex
+// Automatically and simultaneously synchronizes data across all devices (PC, Phone, Tablet)
+// without requiring manual QR codes or links.
+
 export const CLOUD_BINS = {
   meta: 'dbafcce',
   schools: 'accffec',
@@ -96,11 +100,32 @@ export function onCloudSyncStatusChange(callback) {
 }
 
 /**
- * Fetch a JSON bin from cloud with cache-busting and timeout
+ * Fetch a JSON bin from cloud:
+ * 1. Tries same-origin Cloudflare Edge API (/api/sync/get)
+ * 2. Falls back to direct ExtendsClass URL with cache-busting
  */
-async function fetchBin(binId, timeoutMs = 7000) {
+async function fetchBin(binName, timeoutMs = 8000) {
+  const binId = CLOUD_BINS[binName];
+  if (!binId) throw new Error('Unknown bin: ' + binName);
+
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  // Strategy 1: Same-origin Worker proxy (Clean, bypasses all CORS)
+  try {
+    const res = await fetch(`/api/sync/get?bin=${binName}&_t=${Date.now()}`, {
+      headers: { 'Accept': 'application/json' },
+      signal: controller.signal,
+      cache: 'no-store'
+    });
+    if (res.ok) {
+      clearTimeout(timer);
+      const data = await res.json();
+      return data;
+    }
+  } catch {}
+
+  // Strategy 2: Direct URL fallback
   try {
     const url = `${BASE_API}/${binId}?_t=${Date.now()}`;
     const res = await fetch(url, {
@@ -122,26 +147,48 @@ async function fetchBin(binId, timeoutMs = 7000) {
 }
 
 /**
- * Save data to a cloud bin via PUT with timeout
+ * Save data to a cloud bin:
+ * 1. Tries same-origin Cloudflare Edge API (/api/sync/put)
+ * 2. Falls back to direct ExtendsClass PUT with text/plain (skips browser OPTIONS preflight 500)
  */
-async function updateBin(binId, payload, timeoutMs = 9000) {
+async function updateBin(binName, payload, timeoutMs = 10000) {
+  const binId = CLOUD_BINS[binName];
+  if (!binId) throw new Error('Unknown bin: ' + binName);
+
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const bodyString = JSON.stringify(payload);
+
+  // Strategy 1: Same-origin Worker proxy (Safe & Direct)
+  try {
+    const res = await fetch(`/api/sync/put?bin=${binName}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: bodyString,
+      signal: controller.signal,
+    });
+    if (res.ok) {
+      clearTimeout(timer);
+      return await res.json().catch(() => ({ ok: true }));
+    }
+  } catch {}
+
+  // Strategy 2: Direct ExtendsClass with text/plain header
   try {
     const url = `${BASE_API}/${binId}`;
     const res = await fetch(url, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'text/plain',
       },
-      body: JSON.stringify(payload),
+      body: bodyString,
       signal: controller.signal,
     });
     clearTimeout(timer);
     if (!res.ok) {
       throw new Error(`HTTP ${res.status} updating bin ${binId}`);
     }
-    return await res.json();
+    return await res.json().catch(() => ({ ok: true }));
   } catch (err) {
     clearTimeout(timer);
     throw err;
@@ -164,7 +211,7 @@ export function schedulePushToCloud(key, data) {
 
   setStatus('syncing');
 
-  // Debounce by 700ms to batch rapid successive edits
+  // Debounce by 600ms to batch rapid successive edits
   pushTimeouts[key] = setTimeout(async () => {
     delete pushTimeouts[key];
     try {
@@ -173,10 +220,9 @@ export function schedulePushToCloud(key, data) {
         return;
       }
 
-      const binId = CLOUD_BINS[binName];
-      await updateBin(binId, data);
+      await updateBin(binName, data);
 
-      // Now update meta bin
+      // Update meta bin
       const nowIso = new Date().toISOString();
       const meta = {
         version: Date.now(),
@@ -184,7 +230,7 @@ export function schedulePushToCloud(key, data) {
         updatedKey: binName,
         deviceId: getDeviceId(),
       };
-      await updateBin(CLOUD_BINS.meta, meta);
+      await updateBin('meta', meta);
 
       try {
         localStorage.setItem('hoda_cloud_synced_at', nowIso);
@@ -195,7 +241,7 @@ export function schedulePushToCloud(key, data) {
       console.warn('[CloudSync] Error pushing to cloud:', err);
       setStatus('error', err.message || 'خطا در اتصال به سرور ابری');
     }
-  }, 700);
+  }, 600);
 }
 
 /**
@@ -212,7 +258,7 @@ export function pullFromCloud(force = false) {
   return (async () => {
     try {
       // 1. Fetch metadata
-      const meta = await fetchBin(CLOUD_BINS.meta);
+      const meta = await fetchBin('meta');
       if (!meta || !meta.lastUpdated) return false;
 
       const localSyncedAt = localStorage.getItem('hoda_cloud_synced_at');
@@ -240,7 +286,7 @@ export function pullFromCloud(force = false) {
         const collections = ['schools', 'news', 'achievements', 'documents', 'members', 'settings', 'teachers', 'facilities'];
         const results = await Promise.allSettled(
           collections.map(async (col) => {
-            const data = await fetchBin(CLOUD_BINS[col]);
+            const data = await fetchBin(col);
             return { col, data };
           })
         );
@@ -264,10 +310,9 @@ export function pullFromCloud(force = false) {
       } else {
         // Pull only the single modified collection
         const col = meta.updatedKey;
-        const binId = CLOUD_BINS[col];
         const storageKey = BIN_TO_KEY[col];
-        if (binId && storageKey) {
-          const data = await fetchBin(binId);
+        if (col && storageKey) {
+          const data = await fetchBin(col);
           if (data !== undefined && data !== null) {
             try {
               localStorage.setItem(storageKey, JSON.stringify(data));
@@ -298,7 +343,7 @@ export function pullFromCloud(force = false) {
  * Push all local data to cloud immediately (Full Cloud Seed/Sync)
  */
 export async function pushAllToCloud() {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return false;
   if (!navigator.onLine) {
     setStatus('offline');
     throw new Error('اتصال اینترنت برقرار نیست.');
@@ -314,7 +359,7 @@ export async function pushAllToCloud() {
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
-          await updateBin(CLOUD_BINS[col], parsed);
+          await updateBin(col, parsed);
         } catch {}
       }
     }
@@ -326,7 +371,7 @@ export async function pushAllToCloud() {
       updatedKey: 'all',
       deviceId: getDeviceId(),
     };
-    await updateBin(CLOUD_BINS.meta, meta);
+    await updateBin('meta', meta);
     localStorage.setItem('hoda_cloud_synced_at', nowIso);
     setStatus('synced');
     return true;
@@ -344,9 +389,22 @@ export function initAutoCloudSync() {
   if (typeof window === 'undefined' || isInitialized) return () => {};
   isInitialized = true;
 
-  // 1. Initial check & pull from cloud in background (non-blocking)
-  setTimeout(() => {
-    pullFromCloud(false);
+  // 1. Initial smart sync check
+  setTimeout(async () => {
+    try {
+      const meta = await fetchBin('meta').catch(() => null);
+      const isSuperAdmin = !!localStorage.getItem('hoda_admin_token') || !!localStorage.getItem('hoda_admin_session');
+      
+      // If admin on PC has local data and cloud is still on initial baseline: push PC data!
+      if (isSuperAdmin && meta && (meta.device === 'initial-seed' || !meta.device)) {
+        await pushAllToCloud();
+        return;
+      }
+      
+      await pullFromCloud(false);
+    } catch {
+      pullFromCloud(false);
+    }
   }, 300);
 
   // 2. Poll metadata periodically (every 18 seconds)
