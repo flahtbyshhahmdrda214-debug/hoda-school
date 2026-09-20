@@ -202,7 +202,50 @@ export function initMockStorage() {
       teachers: s.teachers || [],
       facilities: s.facilities || [],
     })));
+  } else {
+    // Sync latest 3D icons from schoolsData
+    try {
+      const currentSchools = getItem(STORAGE_KEYS.SCHOOLS, null);
+      if (currentSchools && Array.isArray(currentSchools)) {
+        let changed = false;
+        currentSchools.forEach(cs => {
+          const fresh = schoolsData.find(s => s.id === cs.id);
+          if (fresh && (cs.icon3d !== fresh.icon3d || cs.icon3dUrl !== fresh.icon3d)) {
+            cs.icon3d = fresh.icon3d;
+            cs.icon3dUrl = fresh.icon3d;
+            changed = true;
+          }
+        });
+        if (changed) {
+          setItem(STORAGE_KEYS.SCHOOLS, currentSchools);
+        }
+      }
+    } catch {}
   }
+
+  // Sync member principals 3D icons
+  try {
+    const currentMembers = getItem(STORAGE_KEYS.MEMBERS, null);
+    if (currentMembers && Array.isArray(currentMembers.principals)) {
+      let mChanged = false;
+      currentMembers.principals.forEach(p => {
+        if (p.id === 'principal-1' || p.schoolId === 1) {
+          if (p.icon3d !== '/assets/icon-school1.png') {
+            p.icon3d = '/assets/icon-school1.png';
+            mChanged = true;
+          }
+        } else if (p.id === 'principal-2' || p.schoolId === 2) {
+          if (p.icon3d !== '/assets/icon-school2.png') {
+            p.icon3d = '/assets/icon-school2.png';
+            mChanged = true;
+          }
+        }
+      });
+      if (mChanged) {
+        setItem(STORAGE_KEYS.MEMBERS, currentMembers);
+      }
+    }
+  } catch {}
 
   // 2. News
   if (!localStorage.getItem(STORAGE_KEYS.NEWS)) {

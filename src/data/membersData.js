@@ -103,7 +103,7 @@ export const membersData = {
       roleCategory: 'principal',
       roleLabel: 'مدیر مدرسه',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
-      icon3d: '/assets/icon-school2-board.png',
+      icon3d: '/assets/icon-school2.png',
       themeColor: 'navy',
       badgeClass: 'bg-navy-50 text-navy-800 border-navy-200',
       degree: 'کارشناسی ارشد مدیریت آموزشی از دانشگاه شهید بهشتی',
