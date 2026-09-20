@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Sparkles, GraduationCap, PhoneCall, ArrowLeft, BookOpen, Trophy } from 'lucide-react';
+import { ChevronDown, Sparkles, PhoneCall, ArrowLeft, Trophy, Newspaper } from 'lucide-react';
 import { schoolsData } from '../data/schoolsData';
 import { fetchSchools } from '../services/schoolsService';
 import { onDataChanged } from '../services/dataEvents';
@@ -89,7 +89,6 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
             </div>
           </div>
           <div className="hidden sm:flex items-center gap-5 text-slate-200">
-            <a href="#schools" className="hover:text-turquoise-400 transition-colors font-medium">مدارس چهارگانه</a>
             <a href="#honors" className="hover:text-amber-300 transition-colors font-medium text-amber-300 flex items-center gap-1">
               <Trophy className="w-3.5 h-3.5" />
               <span>تالار افتخارات</span>
@@ -179,11 +178,11 @@ export default function Hero({ onSelectSchool, onScrollToNews, onScrollToIdentit
           {/* Institutional Showcase CTA Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3.5 mt-5">
             <a
-              href="#schools"
+              href="#news"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-turquoise-500 hover:bg-turquoise-400 text-slate-950 font-black text-sm shadow-[0_10px_30px_rgba(20,184,166,0.35)] hover:shadow-[0_14px_35px_rgba(20,184,166,0.5)] transition-all transform hover:-translate-y-0.5"
             >
-              <GraduationCap className="w-4 h-4 text-slate-950" />
-              بررسی مدارس چهارگانه
+              <Newspaper className="w-4 h-4 text-slate-950" />
+              <span>اخبار و اطلاعیه‌های مجتمع</span>
             </a>
             <a
               href="#honors"
