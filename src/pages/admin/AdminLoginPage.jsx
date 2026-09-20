@@ -36,7 +36,12 @@ export default function AdminLoginPage() {
           {/* Logo & Title */}
           <div className="text-center space-y-3">
             <div className="w-20 h-20 mx-auto rounded-2xl bg-white/5 border border-white/10 p-2 flex items-center justify-center shadow-inner">
-              <img src="/assets/hoda-logo.png" alt="لوگوی هدی" className="w-full h-full object-contain" />
+              <img 
+                src="/assets/hoda-3d-logo-transparent.png" 
+                onError={(e) => { e.currentTarget.src = '/assets/hoda-logo.png'; }}
+                alt="لوگوی هدی" 
+                className="w-full h-full object-contain drop-shadow-[0_4px_12px_rgba(13,148,136,0.35)]" 
+              />
             </div>
             <h1 className="text-xl font-extrabold text-white">سامانه مدیریت مجتمع هدی</h1>
             <p className="text-xs text-slate-400">ورود مدیران، کارشناسان آموزشی و دبیران</p>

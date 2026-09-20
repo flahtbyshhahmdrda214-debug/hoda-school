@@ -239,3 +239,75 @@
 .animate-shadow-s3 { animation: shadow-s3 4.5s ease-in-out infinite 1.2s; }
 .animate-shadow-s4 { animation: shadow-s4 5.1s ease-in-out infinite 1.8s; }
 
+/* Animated Footer Wave, Glow and Interactions */
+@keyframes footer-wave-flow {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes footer-wave-flow-reverse {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-wave-flow-1 {
+  animation: footer-wave-flow 24s linear infinite;
+}
+
+.animate-wave-flow-2 {
+  animation: footer-wave-flow-reverse 18s linear infinite;
+}
+
+.animate-wave-flow-3 {
+  animation: footer-wave-flow 12s linear infinite;
+}
+
+@keyframes phone-ring {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-16deg) scale(1.12); }
+  30% { transform: rotate(16deg) scale(1.12); }
+  45% { transform: rotate(-10deg) scale(1.06); }
+  60% { transform: rotate(10deg) scale(1.06); }
+  75% { transform: rotate(-4deg); }
+}
+
+.group:hover .animate-phone-ring {
+  animation: phone-ring 0.8s ease-in-out;
+}
+
+@keyframes footer-orb-pulse {
+  0%, 100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.25) translate(15px, -15px);
+    opacity: 0.65;
+  }
+}
+
+.animate-footer-orb {
+  animation: footer-orb-pulse 7s ease-in-out infinite;
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-shimmer-sweep {
+  animation: shimmer-sweep 3s ease-in-out infinite;
+}
+

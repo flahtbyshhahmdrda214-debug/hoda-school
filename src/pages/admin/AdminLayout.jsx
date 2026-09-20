@@ -49,7 +49,12 @@ export default function AdminLayout() {
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-64 bg-navy-950 text-white border-l border-navy-800 flex-shrink-0">
         <div className="p-6 border-b border-navy-800 flex items-center gap-3">
-          <img src="/assets/hoda-logo.png" alt="Hoda Logo" className="w-10 h-10 object-contain drop-shadow-md" />
+          <img 
+            src="/assets/hoda-3d-logo-transparent.png" 
+            onError={(e) => { e.currentTarget.src = '/assets/hoda-logo.png'; }}
+            alt="Hoda Logo" 
+            className="w-10 h-10 object-contain drop-shadow-[0_2px_8px_rgba(13,148,136,0.3)] hover:scale-105 transition-transform" 
+          />
           <div>
             <h2 className="text-sm font-bold text-white leading-tight">پنل مدیریت هدی</h2>
             <span className="text-[10px] text-turquoise-400 font-mono tracking-wider">CMS v2.0 Production</span>
@@ -108,6 +113,12 @@ export default function AdminLayout() {
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
+            <img 
+              src="/assets/hoda-3d-logo-transparent.png" 
+              onError={(e) => { e.currentTarget.src = '/assets/hoda-logo.png'; }}
+              alt="Hoda Logo" 
+              className="w-8 h-8 object-contain md:hidden drop-shadow-sm" 
+            />
             <h1 className="text-base font-bold text-navy-950">سامانه مدیریت محتوای هدی</h1>
           </div>
 
@@ -125,6 +136,18 @@ export default function AdminLayout() {
         {/* Mobile Drawer */}
         {sidebarOpen && (
           <div className="md:hidden bg-navy-950 text-white p-4 space-y-2 border-b border-navy-800">
+            <div className="flex items-center gap-3 pb-3 mb-2 border-b border-navy-800/80">
+              <img 
+                src="/assets/hoda-3d-logo-transparent.png" 
+                onError={(e) => { e.currentTarget.src = '/assets/hoda-logo.png'; }}
+                alt="Hoda Logo" 
+                className="w-9 h-9 object-contain drop-shadow-sm" 
+              />
+              <div>
+                <div className="text-sm font-bold text-white">پنل مدیریت مجتمع هدی</div>
+                <div className="text-[10px] text-turquoise-400 font-mono">CMS v2.0 Production</div>
+              </div>
+            </div>
             {navItems.map((item) => {
               const Icon = item.icon;
               return (

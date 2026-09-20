@@ -31,7 +31,8 @@ export default function Navbar() {
         {/* Brand Logo & Name */}
         <Link to="/" className="flex items-center gap-3 group">
           <img 
-            src="/assets/hoda-logo.png" 
+            src="/assets/hoda-3d-logo-transparent.png" 
+            onError={(e) => { e.currentTarget.src = '/assets/hoda-logo.png'; }}
             alt="لوگوی مجتمع هدی" 
             className="w-12 h-12 object-contain drop-shadow-[0_4px_10px_rgba(19,181,222,0.3)] group-hover:scale-105 transition-transform" 
           />
