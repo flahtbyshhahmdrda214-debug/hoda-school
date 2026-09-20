@@ -28,6 +28,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminAuditLogs from './pages/admin/AdminAuditLogs';
 import ProtectedRoute from './components/ProtectedRoute';
 import { initSiteFont } from './services/fontService';
+import { initAutoCloudSync } from './services/cloudSyncService';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -48,8 +49,12 @@ function ScrollToTop() {
 
 export default function App() {
   useEffect(() => {
-    const cleanup = initSiteFont();
-    return cleanup;
+    const fontCleanup = initSiteFont();
+    const cloudCleanup = initAutoCloudSync();
+    return () => {
+      if (typeof fontCleanup === 'function') fontCleanup();
+      if (typeof cloudCleanup === 'function') cloudCleanup();
+    };
   }, []);
 
   return (

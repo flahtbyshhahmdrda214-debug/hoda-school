@@ -5,6 +5,7 @@ import { schoolsData } from '../data/schoolsData.js';
 import { newsData } from '../data/newsData.js';
 import { credentialsData } from '../data/credentialsData.js';
 import { membersData } from '../data/membersData.js';
+import { schedulePushToCloud } from './cloudSyncService.js';
 
 export const STORAGE_KEYS = {
   SCHOOLS: 'hoda_schools_db',
@@ -148,6 +149,8 @@ export function setItem(key, val) {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('hoda_data_changed', { detail: { key, val } }));
     }
+    // Automatically synchronize changes with cloud bins
+    schedulePushToCloud(key, val);
   } catch (err) {
     console.error('LocalStorage write error:', err);
   }

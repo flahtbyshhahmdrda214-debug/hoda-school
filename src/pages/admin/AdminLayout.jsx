@@ -5,9 +5,10 @@ import {
   LayoutDashboard, School, Newspaper, Users, Building2, 
   FileText, Image, Settings, ShieldCheck, History, LogOut, ExternalLink, Menu, X, Trophy, Type, UserCheck,
   RefreshCw, ArrowUp, Clock, Sparkles, CheckCircle2, ChevronRight, ChevronLeft,
-  Smartphone, QrCode
+  Smartphone, QrCode, Cloud, CloudCheck, Wifi
 } from 'lucide-react';
 import SyncModal from '../../components/SyncModal';
+import { onCloudSyncStatusChange, pullFromCloud } from '../../services/cloudSyncService';
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -15,8 +16,17 @@ export default function AdminLayout() {
   const [sidePanelOpen, setSidePanelOpen] = useState(false);
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState('');
+  const [cloudStatus, setCloudStatus] = useState({ status: 'synced' });
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
   const mainRef = useRef(null);
   const user = getCurrentUser() || { fullName: 'مدیر سیستم', role: 'SUPERADMIN' };
+
+  useEffect(() => {
+    const unsub = onCloudSyncStatusChange((s) => {
+      setCloudStatus(s);
+    });
+    return unsub;
+  }, []);
 
   useEffect(() => {
     const updateTime = () => {
@@ -102,11 +112,51 @@ export default function AdminLayout() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Cloud Auto-Sync Live Indicator */}
+          <button
+            onClick={async () => {
+              if (isManualSyncing) return;
+              setIsManualSyncing(true);
+              try {
+                await pullFromCloud(true);
+              } catch (e) {
+                console.error(e);
+              } finally {
+                setIsManualSyncing(false);
+              }
+            }}
+            disabled={isManualSyncing}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-xs ${
+              isManualSyncing || cloudStatus.status === 'syncing'
+                ? 'bg-amber-50 text-amber-800 border-amber-300'
+                : cloudStatus.status === 'error' || cloudStatus.status === 'offline'
+                ? 'bg-rose-50 text-rose-800 border-rose-300'
+                : 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+            }`}
+            title="همگام‌سازی ابری خودکار فعال است - کلیک برای به‌روزرسانی دستی"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isManualSyncing || cloudStatus.status === 'syncing' ? 'animate-spin text-amber-600' : 'text-emerald-600'}`} />
+            <span className="hidden md:inline">
+              {isManualSyncing || cloudStatus.status === 'syncing' 
+                ? 'در حال همگام‌سازی ابری...' 
+                : cloudStatus.status === 'offline' 
+                ? 'آفلاین' 
+                : 'همگام با ابر'}
+            </span>
+            <span className={`w-2 h-2 rounded-full ${
+              isManualSyncing || cloudStatus.status === 'syncing' 
+                ? 'bg-amber-500 animate-pulse' 
+                : cloudStatus.status === 'offline' 
+                ? 'bg-rose-500' 
+                : 'bg-emerald-500'
+            }`} />
+          </button>
+
           {/* Mobile Sync Button */}
           <button
             onClick={() => setIsSyncModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
             title="همگام‌سازی و انتقال اطلاعات به گوشی"
           >
             <Smartphone className="w-3.5 h-3.5" />
